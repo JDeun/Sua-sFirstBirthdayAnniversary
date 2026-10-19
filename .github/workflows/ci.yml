@@ -27,3 +27,5 @@ jobs:
           node-version: "22"
       - run: npm install --no-audit --no-fund
       - run: npm run typecheck
+      - name: Validate Remotion composition bundling
+        run: npx remotion compositions src/index.ts
