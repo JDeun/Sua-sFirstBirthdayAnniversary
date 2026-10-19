@@ -13,14 +13,15 @@ import {
   findActiveCutIndex,
   MATCHCUT_END_FRAME,
   OPENING_DURATION_FRAMES,
-  VERSE_START_FRAME,
+  SONG_START_FRAME,
 } from './timing';
 
 /** 공개 저장소에 개인 사진을 넣지 않고 props로 승인된 로컬 프레임만 전달합니다. */
 export type OpeningSequenceProps = {
   imagePaths: string[];
   musicPath: string;
-  timing?: {matchcutEndFrame: number; verseStartFrame: number};
+  soundEffects?: {montagePath?: string; titleImpactPath?: string};
+  timing?: {matchcutEndFrame: number; songStartFrame?: number; verseStartFrame?: number};
 };
 
 const demoPalettes = ['#E8C6B2', '#D7B399', '#CFAC92', '#D9BDA4', '#E2BDA8'];
@@ -185,37 +186,57 @@ const VerseBegins: React.FC = () => {
 };
 
 /**
- * 음악 기준 초안: 0~9초 가속 매치컷 → 9~12초 강한 타이틀
- * → 12초부터 벌스/본편. 실제 Suno 음원 편곡/마커에 맞춰 조정.
+ * 콜드 오픈: 매치컷에는 배경음악을 넣지 않습니다.
+ * 0~9s 사진과 선택적 전환 효과음 → 9~12s 타이틀 + 선택적 임팩트 효과음
+ * → 12s부터 Suno 완성곡의 처음(0:00)을 재생합니다.
+ * 실제 시점은 props.timing으로 조정 가능; 음악 파일 자체를 잘라 시작하지 않습니다.
  */
 export const OpeningSequence: React.FC<OpeningSequenceProps> = ({
   imagePaths,
   musicPath,
+  soundEffects,
   timing,
 }) => {
   const matchcutEnd = timing?.matchcutEndFrame ?? MATCHCUT_END_FRAME;
-  const verseStart = timing?.verseStartFrame ?? VERSE_START_FRAME;
+  // 이전 버전 props의 verseStartFrame도 안전하게 읽되, 신규 키는 songStartFrame입니다.
+  const songStart = timing?.songStartFrame ?? timing?.verseStartFrame ?? SONG_START_FRAME;
   if (
     !Number.isInteger(matchcutEnd) ||
-    !Number.isInteger(verseStart) ||
+    !Number.isInteger(songStart) ||
     matchcutEnd < 2 ||
-    verseStart - matchcutEnd < 15 ||
-    verseStart >= OPENING_DURATION_FRAMES
+    songStart - matchcutEnd < 15 ||
+    songStart >= OPENING_DURATION_FRAMES
   ) {
-    throw new Error('오프닝 마커가 잘못되었습니다. --title-impact/--verse-start를 확인하세요.');
+    throw new Error('콜드 오픈 마커가 잘못되었습니다. 타이틀과 노래 시작 시점을 확인하세요.');
   }
   return (
     <AbsoluteFill>
       <Sequence from={0} durationInFrames={matchcutEnd}>
         <MatchCutMontage imagePaths={imagePaths} totalFrames={matchcutEnd}/>
       </Sequence>
-      <Sequence from={matchcutEnd} durationInFrames={verseStart - matchcutEnd}>
+      <Sequence from={matchcutEnd} durationInFrames={songStart - matchcutEnd}>
         <TitleBeat/>
       </Sequence>
-      <Sequence from={verseStart} durationInFrames={OPENING_DURATION_FRAMES - verseStart}>
+      <Sequence from={songStart} durationInFrames={OPENING_DURATION_FRAMES - songStart}>
         <VerseBegins/>
       </Sequence>
-      {musicPath ? <Audio src={staticFile(musicPath)} volume={0.85}/> : null}
+      {/* 선택적 효과음만 사용. 아무 파일도 지정하지 않으면 콜드 오픈은 무음입니다. */}
+      {soundEffects?.montagePath ? (
+        <Sequence from={0} durationInFrames={matchcutEnd} layout="none">
+          <Audio src={staticFile(soundEffects.montagePath)} volume={0.35}/>
+        </Sequence>
+      ) : null}
+      {soundEffects?.titleImpactPath ? (
+        <Sequence from={matchcutEnd} durationInFrames={songStart - matchcutEnd} layout="none">
+          <Audio src={staticFile(soundEffects.titleImpactPath)} volume={0.5}/>
+        </Sequence>
+      ) : null}
+      {/* 완성곡의 첫 샘플이 정확히 노래 시작 프레임에서 재생됩니다. */}
+      {musicPath ? (
+        <Sequence from={songStart} durationInFrames={OPENING_DURATION_FRAMES - songStart} layout="none">
+          <Audio src={staticFile(musicPath)} volume={0.85}/>
+        </Sequence>
+      ) : null}
     </AbsoluteFill>
   );
 };

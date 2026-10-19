@@ -1,79 +1,56 @@
-# 음악 제작 가이드: 오프닝 매치컷 + 수아 첫돌 성장영상
+# Suno 웹 제작 가이드: 완성곡은 콜드 오픈과 분리
 
-음악은 사용자가 **Suno 등으로 직접 제작**하며, 저장소에는 음악 원본을 넣지 않습니다.
+## 확정 원칙
 
-## 원하는 감정 곡선
+**Suno에서는 오프닝 라이저/프리코러스/타이틀 효과음을 만들지 않습니다.**
+90년대 컨템퍼러리 R&B/팝 소울 곡을 독립된 **완성곡**으로 제작합니다.
+뮤직비디오식 초고속 매치컷 8~10초는 별도로 무음 또는 효과음만 편집하고,
+2~3초의 타이틀 이후 Suno 파일을 **처음부터** 재생합니다.
 
-```text
-시간(임시)       0s               9s       12s                 본편
-음악          점층 상승 >>>>>>  [IMPACT]   벌스 (감성·따뜻함) >>> 후반 코러스
-화면          얼굴 가속 매치컷     타이틀     탄생·가족 이야기
-감정          기대감·집중        전환/해소  다정함과 몰입
-```
+음원 자체의 인트로가 4초, 10초 등으로 다르더라도 노래는 0초부터 시작합니다.
+생성된 노래의 벌스 시작 시점을 임의로 12초에 맞추려 할 필요가 없습니다.
 
-- **0~9초:** 짧은 스타카토·리듬 층 추가·음역/강약 상승; 사진 전환이 점진적으로 빨라지도록
-- **9초:** 강렬하지만 날카롭지 않은 단발성 악센트/임팩트. 타이틀 화면 전환
-- **9~12초:** 잔향과 짧은 공간. 타이틀을 읽을 수 있도록
-- **12초 이후:** 따뜻한 벌스 시작. 이 지점부터 성장 본편이 진행되도록 음악 구성
-- **중·후반:** 가사/멜로디의 정서적 절정, 가족의 목소리가 나올 때는 음악을 덕킹할 수 있어야 함
-- **종결:** 여운이 남는 엔딩
+## 음악 스타일 권장
 
-**중요:** Suno에 초를 숫자로 입력한다고 정확히 그 시점에 벌스가 시작되는 것은 보장되지 않습니다. 필요하면 제작한 음악을 DAW에서 인트로/악센트/벌스 단위로 편집하여 마커를 맞춥니다.
+- 90s contemporary R&B / gospel-influenced pop soul / warm family love ballad
+- 80~86 BPM 전후, 4/4, 느슨한 스윙
+- Rhodes, 따뜻한 베이스, 드럼, 어쿠스틱 피아노, 절제된 스트링, 다층 가스펠 백킹
+- 섬세한 벌스 → 풍성한 후렴 → 영적인 감사가 담긴 브리지 → 마지막 후렴의 화음 확장
+- 특정 가수의 목소리, 기존 곡의 후렴/멜로디를 복제하지 않습니다.
 
-## Suno 시도용 콘셉트 문구 (영문)
+### 웹 사용
 
-> Heartfelt cinematic indie-pop song for a baby's first birthday film. Begin with a 9-second instrumental rhythmic build, gradually accelerating tension and layering percussion. Add one strong uplifting impact for a title card, then a brief breathing space. Let a warm and intimate verse enter around the 12-second mark with gentle vocals. Evolve into an emotionally uplifting chorus. Soft piano, acoustic guitar, organic percussion, delicate strings, modern polished production. No abrupt silence, no harsh flashes or aggressive sound effects.
+1. <https://suno.com/create> 접속 → **Custom** 선택
+2. **Lyrics**에 본인이 확정한 원곡 가사 전체, **Styles**에 악기·시대감·장르, **Title**에 곡명 입력
+3. 모델은 이용 가능한 경우 **v6** 우선, 무료라면 **v6-mini**. `Instrumental`은 끕니다.
+4. **Exclude**에 trap hi-hats, EDM drop, heavy autotune 등 원하지 않는 요소를 기록
+5. 결과의 발음·음절·멜로디·보컬 질감을 확인하고 좋은 버전을 고릅니다.
+6. 곡을 로컬로 내려받아 `video/public/media/music/suno-final.wav` 등에 저장합니다.
 
-편곡이 원하는 대로 나오지 않으면 Suno에서 **인트로 라이저/임팩트용 별도 짧은 파일**을 만들거나 DAW에서 타이밍을 수동 편집하는 편이 정확합니다. 인트로와 본편의 키·템포·음향적 질감이 이질적이지 않도록 주의하세요.
+현재 공식 도움말(2026-09)은 v6/v6-wild/v6-mini 지원과 별도의 다운로드 할당량을 명시합니다.
+- https://help.suno.com/en/articles/13924801
+- https://help.suno.com/en/articles/2415873
+- https://help.suno.com/en/articles/3161921
+- https://help.suno.com/en/articles/13926209
 
-## 오디오 파일 준비
+곡 전체 길이와 4분 성장영상은 원본 실제 길이에 맞춰 후속 조정합니다.
+Suno의 MP3/WAV로 저장할 수 있는지는 계정 플랜/다운로드 정책을 확인하세요.
 
-- 최종 파일 권장: WAV 44.1kHz 또는 48kHz 스테레오(가능하면 무손실), 없으면 고품질 MP3
-- 로컬 저장 위치: `video/public/media/music/intro.wav` 또는 로컬 전용 경로
-- 실제 최종 음악의 마커 기록(시간은 예시이고 아직 확정되지 않음):
-
-~~~json
-{
-  "fps": 30,
-  "music_file": "media/music/intro.wav",
-  "markers": {
-    "matchcut_start_sec": 0,
-    "title_impact_sec": 9,
-    "verse_start_sec": 12
-  },
-  "status": "draft_unverified"
-}
-~~~
-
-위 JSON은 **설계 예시**입니다. 이제 `sua-audio-cues`가 **로컬 오디오의 순간 에너지 상승(어택 후보)**을 찾아줍니다. 음악의 의미 있는 '벌스 시작'을 자동 인식하는 기능은 아니므로 사용자가 귀로 확인한 시점을 명시적으로 입력해야 합니다.
+## 로컬 영상 연결
 
 ~~~bash
-# 준비: video/public/media/music/intro.wav에 사용자가 직접 만든 음악 파일 복사
-sua-audio-cues video/public/media/music/intro.wav --out data/audio-cues.json
-
-# 후보를 참고해 음악을 듣고 시점을 직접 승인한 후 입력 (시간은 예시)
-sua-audio-cues video/public/media/music/intro.wav \\
-  --title-impact 9.2 --verse-start 12.5 \\
-  --props data/opening-props.json --music-relative media/music/intro.wav
-
-cd video
-npx remotion render src/index.ts OpeningSequence out/opening.mp4 --props=../data/opening-props.json
+sua-cold-open --props data/opening-props.json \
+  --title-at 9 --song-start 12 \
+  --music media/music/suno-final.wav
 ~~~
 
-`--props`를 지정하면 기존 승인 사진 `imagePaths`를 유지한 채 `timing.matchcutEndFrame`과 `timing.verseStartFrame`을 갱신합니다. 현재 18초 프리뷰 길이 안에서만 유효하며 전체 본편 타이밍은 후속 개발입니다. 음악 마커가 확정되지 않았다면 **9초/12초 기본 데모**를 유지합니다. 디코딩은 로컬 FFmpeg에서 수행합니다.
+음악 자체의 드럼 어택이나 후렴을 자세히 파악하려면 `sua-audio-cues`가 보조적으로 쓸 수 있으나,
+**곡 분석이 콜드 오픈에 필수는 아닙니다.**
+이전 `sua-audio-cues --title-impact --verse-start` 방식은 **콜드 오픈 설정 용도로 사용하지 않습니다.**
 
-## Suno 이용 권리 확인
+## 권리·개인정보
 
-Suno 공식 문서 기준(2026-10 조사):
-
-- Basic 무료 플랜에서 만든 곡은 **개인적·비상업적 이용**만 허용합니다.
-- Pro/Premier 유료 구독 **중 생성한 곡**에는 상업적 이용 권한이 부여됩니다. 구독 이전 무료 생성곡이 구독만으로 소급 허가되는 것은 아닙니다.
-- 플랫폼이 제공하는 이용 권한과 **저작권 보호 여부는 별개**입니다.
-- 돌잔치 행사장에서의 재생, 가족 공유, 소셜미디어/유튜브 게시, 수익화는 이용 조건과 제3자 권리(특히 기존 음원·가사·샘플)를 각각 확인해야 합니다.
-- 라이선스 변경 가능성이 있으니 제작·상영·업로드 시 최신 약관을 다시 확인하세요.
-
-공식 출처:
-- https://help.suno.com/en/articles/9601601
-- https://help.suno.com/en/articles/9601665
-- https://help.suno.com/en/articles/2425729
-- https://help.suno.com/en/articles/2746945
+- 공개 저장소에는 가사 초안·개인 음악을 자동 업로드하지 않습니다.
+- Suno의 무료/유료 계정별 이용/다운로드 정책 및 상영/온라인 게시의 조건을 확인합니다.
+- 계정의 생성물은 기본적으로 Link Only로 관리하고, 가족의 실명/민감한 에피소드 공개를 지양합니다.
+- 공식 약관: https://help.suno.com/en/articles/9601601 · https://help.suno.com/en/articles/9601665

@@ -1,7 +1,7 @@
 /** 음악의 실제 진입점을 확인한 뒤 프레임 수를 교체할 수 있는 설정. */
 export const OPENING_FPS = 30;
 export const MATCHCUT_END_FRAME = 9 * OPENING_FPS;
-export const VERSE_START_FRAME = 12 * OPENING_FPS;
+export const SONG_START_FRAME = 12 * OPENING_FPS; // Suno 곡 파일의 0초 시작 지점
 export const OPENING_DURATION_FRAMES = 18 * OPENING_FPS;
 
 /**
