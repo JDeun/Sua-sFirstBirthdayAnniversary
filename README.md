@@ -35,7 +35,7 @@ This creates a manifest of file paths, hashes, dates, provenance, exact duplicat
 
 ### Optional: direct read-only Drive download
 
-1. Create a Google Cloud project, enable **Google Drive API**, configure OAuth consent and a **Desktop** OAuth client, and save the downloaded credentials as \`credentials.json\` **locally**.
+1. Create a Google Cloud project, enable **Google Drive API**, configure OAuth consent and a **Desktop** OAuth client, and save the downloaded credentials as `credentials.json` **locally**.
 2. Ensure the OAuth Google account has access to the shared folder.
 3. Locate its folder ID in the URL.
 4. Run:
@@ -49,13 +49,13 @@ The sync is **download-only**, skips Google-native docs, and does not delete loc
 
 ### Optional: face-aligned growth match-cut
 
-Download the OpenCV YuNet ONNX model to \`models/face_detection_yunet_2023mar.onnx\` from [opencv_zoo](https://github.com/opencv/opencv_zoo/tree/main/models/face_detection_yunet). Model files are not committed.
+Download the OpenCV YuNet ONNX model to `models/face_detection_yunet_2023mar.onnx` from [opencv_zoo](https://github.com/opencv/opencv_zoo/tree/main/models/face_detection_yunet). Model files are not committed.
 
 ~~~bash
 sua-face-align --manifest data/manifest.json --model models/face_detection_yunet_2023mar.onnx --out output/faces
 ~~~
 
-This writes aligned PNGs and \`report.json\`. Photos with undetectable faces or multiple people need human review; output remains local. Face alignment transforms existing photos; it does not synthesize a new face.
+This writes aligned PNGs and `report.json`. Photos with undetectable faces or multiple people need human review; output remains local. Face alignment transforms existing photos; it does not synthesize a new face.
 
 ### Video scaffold
 
