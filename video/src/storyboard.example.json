@@ -1,0 +1,26 @@
+{
+  "format": "storyboard-v1",
+  "note": "Synthetic example. Actual family files must remain local and ignored.",
+  "fps": 30,
+  "scenes": [
+    {
+      "id": "opening",
+      "type": "title",
+      "duration_frames": 180,
+      "title": "Our Little Story"
+    },
+    {
+      "id": "growth",
+      "type": "media-montage",
+      "duration_frames": 300,
+      "asset_ids": [],
+      "note": "Add reviewed, local-only media IDs"
+    },
+    {
+      "id": "ending",
+      "type": "title",
+      "duration_frames": 120,
+      "title": "Happy First Birthday"
+    }
+  ]
+}

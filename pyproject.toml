@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sua-first-birthday"
+version = "0.1.0"
+description = "Local-first birthday media catalog, Drive ingestion, and geometric face alignment"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+images = ["Pillow>=10,<13", "pillow-heif>=0.18,<2"]
+drive = ["google-api-python-client>=2,<3", "google-auth-oauthlib>=1,<2", "google-auth-httplib2>=0.2,<1"]
+vision = ["opencv-python>=4.8,<5", "numpy>=1.26,<3", "Pillow>=10,<13"]
+
+[project.scripts]
+sua-media = "sua_media.catalog:main"
+sua-drive = "sua_media.drive:main"
+sua-face-align = "sua_media.faces:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
