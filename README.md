@@ -12,6 +12,26 @@ Privacy-first, **local-first** family media pipeline for a first-birthday film. 
 - Optionally face-align selected images using OpenCV YuNet for a growth match-cut (manual review still required).
 - Start a Remotion video project with an original, editable placeholder composition.
 
+## Vendor research and original motion-template previews
+
+Publicly documented first-birthday video references were compared in [Market Research](docs/MARKET_RESEARCH_2026-10.md), with the proposed **4-minute story plan** in [Template Spec](docs/TEMPLATE_SPEC.md).
+
+Three original **24-second synthetic design previews** are included; none includes private family media or reproduces a commercial vendor's graphics:
+
+- `CinematicPreview` — documentary / minimalist typography
+- `ScrapbookPreview` — paper collage / polaroid styling
+- `VarietyPreview` — bold captions / energetic motion
+
+~~~bash
+cd video
+npm install
+npm run dev
+# Select any Preview composition in Remotion Studio.
+npx remotion render src/index.ts CinematicPreview out/cinematic-demo.mp4
+~~~
+
+For alternative renders and details, see [video/README.md](video/README.md). These are **style explorations**, not the final edited 4-minute film.
+
 ## Requirements
 
 Python 3.11+, Node.js 20+, FFmpeg, ExifTool (recommended), and a local disk with enough space for downloads and rendering.
