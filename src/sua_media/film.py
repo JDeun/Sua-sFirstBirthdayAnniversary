@@ -160,7 +160,29 @@ def prepare_film(
         validated.append((src, kind, chapter, caption, treatment, start))
         weights.append(weight)
 
-    durations = allocate_frames(weights, story_frames)
+    # Two authoring modes:
+    # - weight: automatic rough-cut preview, no editing expertise needed
+    # - cut_at_seconds: exact lyric/beat-aligned cuts chosen by the editing agent,
+    #   reviewed by the family; times are relative to Suno song 0:00.
+    marked = ["cut_at_seconds" in item for item in entries]
+    if any(marked):
+        if not all(marked):
+            raise ValueError("정확한 컷 모드에서는 모든 샷에 cut_at_seconds가 필요합니다.")
+        starts: list[int] = []
+        for i, item in enumerate(entries):
+            cut = item["cut_at_seconds"]
+            if isinstance(cut, bool) or not isinstance(cut, (int, float)) or not math.isfinite(cut) or cut < 0:
+                raise ValueError(f"샷 {i}: cut_at_seconds는 0 이상의 숫자여야 합니다.")
+            starts.append(round(cut * FPS))
+        if starts[0] != 0:
+            raise ValueError("첫 번째 샷은 노래 시작인 cut_at_seconds=0이어야 합니다.")
+        durations = [
+            end - start for start, end in zip(starts, starts[1:] + [story_frames])
+        ]
+        if any(n < FPS for n in durations):
+            raise ValueError("컷 시점은 오름차순이어야 하고, 각 샷은 최소 1초여야 합니다.")
+    else:
+        durations = allocate_frames(weights, story_frames)
     for i, ((src, kind, _, _, _, start), frames) in enumerate(zip(validated, durations)):
         if kind == "video" and start + frames / FPS > probe_duration_seconds(src) + 0.033:
             raise ValueError(f"샷 {i}: 동영상 길이가 할당된 {frames / FPS:.1f}초보다 짧습니다. weight를 줄이거나 다른 샷을 추가하세요.")
