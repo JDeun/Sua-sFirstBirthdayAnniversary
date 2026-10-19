@@ -1,0 +1,216 @@
+"""Build private, user-approved film props without publishing or changing originals.
+
+Story order is explicitly approved. All media copies live below video/public/media,
+which is ignored by Git. No face detection, external APIs, or inferred dates.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import math
+from pathlib import Path
+import shutil
+import subprocess
+
+FPS = 30
+IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".webp"}
+VIDEO_SUFFIXES = {".mp4", ".mov", ".m4v"}
+AUDIO_SUFFIXES = {".mp3", ".wav", ".m4a", ".aac"}
+
+
+def probe_duration_seconds(path: Path) -> float:
+    """FFprobe duration in seconds. Caller handles rounding to whole film frames."""
+    try:
+        result = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1", str(path)],
+            capture_output=True, text=True, check=True, timeout=30,
+        )
+        duration = float(result.stdout.strip())
+    except (OSError, subprocess.CalledProcessError, ValueError) as exc:
+        raise ValueError(f"FFprobe로 길이를 읽을 수 없습니다: {path.name}") from exc
+    if not math.isfinite(duration) or duration <= 0:
+        raise ValueError(f"유효하지 않은 미디어 길이: {path.name}")
+    return duration
+
+
+def allocate_frames(weights: list[float], total: int, minimum: int = FPS) -> list[int]:
+    """Exact sum; chronological order preserved; at least one second per shot."""
+    if not weights or not all(math.isfinite(w) and w > 0 for w in weights):
+        raise ValueError("최소 한 장의 승인 샷과 양수 weight가 필요합니다.")
+    if total < len(weights) * minimum:
+        raise ValueError("음원 길이에 비해 승인 샷이 너무 많습니다.")
+    pool = total - len(weights) * minimum
+    raw = [pool * w / sum(weights) for w in weights]
+    floors = [math.floor(value) for value in raw]
+    left = pool - sum(floors)
+    order = sorted(range(len(weights)), key=lambda i: (-(raw[i] - floors[i]), i))
+    for i in order[:left]:
+        floors[i] += 1
+    return [n + minimum for n in floors]
+
+
+def _source_path(name: str, base: Path) -> Path:
+    if not isinstance(name, str) or not name.strip():
+        raise ValueError("shot.source는 파일 경로 문자열이어야 합니다.")
+    path = Path(name).expanduser()
+    path = (path if path.is_absolute() else base / path).resolve()
+    if not path.is_file():
+        raise ValueError(f"승인한 미디어를 찾을 수 없습니다: {name}")
+    return path
+
+
+def _media_kind(path: Path) -> str:
+    suffix = path.suffix.lower()
+    if suffix in IMAGE_SUFFIXES:
+        return "image"
+    if suffix in VIDEO_SUFFIXES:
+        return "video"
+    raise ValueError(f"지원하지 않는 사진/동영상 형식: {path.name}")
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _copy_private(path: Path, public_dir: Path, folder: str) -> str:
+    """Hashed copies avoid same-name collisions; never overwrite an existing asset."""
+    digest = _sha256(path)
+    filename = f"{digest}{path.suffix.lower()}"
+    dest = public_dir / "media" / folder / filename
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    if not dest.exists():
+        shutil.copy2(path, dest)
+    elif _sha256(dest) != digest:
+        raise ValueError(f"로컬 캐시의 파일이 손상되었습니다: {dest}")
+    return "media/" + folder + "/" + filename
+
+
+def _optional_text(value: object, name: str, max_length: int) -> str | None:
+    if value is None or value == "":
+        return None
+    if not isinstance(value, str) or len(value) > max_length:
+        raise ValueError(f"{name}은 최대 {max_length}글자 문자열이어야 합니다.")
+    return value
+
+
+def prepare_film(
+    approved_path: Path,
+    opening_props_path: Path,
+    song_path: Path,
+    public_dir: Path,
+    props_path: Path,
+    end_card_seconds: float = 4.0,
+) -> dict:
+    """Build a film whose song plays once from t=0, after the silent cold open.
+
+    Validate every input, duration, and video clip before copying or writing.
+    """
+    approval = json.loads(approved_path.read_text(encoding="utf-8"))
+    opening = json.loads(opening_props_path.read_text(encoding="utf-8"))
+    if not isinstance(approval, dict) or not isinstance(approval.get("shots"), list):
+        raise ValueError('승인 파일에는 "shots" 배열이 필요합니다.')
+    entries = approval["shots"]
+    if not entries:
+        raise ValueError("본편에 사용할 사진이나 동영상을 한 개 이상 승인해 주세요.")
+    if not isinstance(opening, dict) or not isinstance(opening.get("imagePaths"), list):
+        raise ValueError("먼저 sua-matchcut으로 opening-props.json을 만드세요.")
+    marker = opening.get("timing") or {}
+    matchcut_end = marker.get("matchcutEndFrame", 270)
+    song_start = marker.get("songStartFrame", marker.get("verseStartFrame", 360))
+    if not (isinstance(matchcut_end, int) and isinstance(song_start, int) and
+            matchcut_end >= 2 and matchcut_end + 15 <= song_start < 540):
+        raise ValueError("콜드 오픈 마커가 유효하지 않습니다.")
+    song_path = song_path.expanduser().resolve()
+    if not song_path.is_file() or song_path.suffix.lower() not in AUDIO_SUFFIXES:
+        raise ValueError("로컬의 유효한 음악 파일(mp3/wav/m4a/aac)을 지정하세요.")
+    song_frames = math.ceil(probe_duration_seconds(song_path) * FPS)
+    if not math.isfinite(end_card_seconds) or not 1 <= end_card_seconds <= 10:
+        raise ValueError("엔딩 카드는 1~10초로 설정하세요.")
+    end_frames = round(end_card_seconds * FPS)
+    story_frames = song_frames - end_frames
+    if story_frames < len(entries) * FPS:
+        raise ValueError("음악 길이에 비해 샷 수가 많거나 엔딩이 너무 깁니다.")
+
+    validated = []
+    weights = []
+    for index, item in enumerate(entries):
+        if not isinstance(item, dict):
+            raise ValueError(f"샷 {index}: 객체 형식이 아닙니다.")
+        src = _source_path(item.get("source"), approved_path.parent)
+        kind = _media_kind(src)
+        weight = item.get("weight", 1)
+        if isinstance(weight, bool) or not isinstance(weight, (int, float)) or not math.isfinite(weight) or weight <= 0:
+            raise ValueError(f"샷 {index}: weight는 양수여야 합니다.")
+        chapter = _optional_text(item.get("chapter"), "chapter", 70)
+        caption = _optional_text(item.get("caption"), "caption", 140)
+        treatment = item.get("treatment", "cinematic")
+        if treatment not in ("cinematic", "scrapbook", "variety"):
+            raise ValueError(f"샷 {index}: treatment가 잘못되었습니다.")
+        start = item.get("start_seconds", 0)
+        if isinstance(start, bool) or not isinstance(start, (int, float)) or not math.isfinite(start) or start < 0:
+            raise ValueError(f"샷 {index}: start_seconds가 잘못되었습니다.")
+        if kind == "image" and start != 0:
+            raise ValueError(f"샷 {index}: 사진에는 start_seconds를 사용할 수 없습니다.")
+        validated.append((src, kind, chapter, caption, treatment, start))
+        weights.append(weight)
+
+    durations = allocate_frames(weights, story_frames)
+    for i, ((src, kind, _, _, _, start), frames) in enumerate(zip(validated, durations)):
+        if kind == "video" and start + frames / FPS > probe_duration_seconds(src) + 0.033:
+            raise ValueError(f"샷 {i}: 동영상 길이가 할당된 {frames / FPS:.1f}초보다 짧습니다. weight를 줄이거나 다른 샷을 추가하세요.")
+
+    public_dir = public_dir.resolve()
+    shots = []
+    elapsed = 0
+    for (src, kind, chapter, caption, treatment, start), frames in zip(validated, durations):
+        path = _copy_private(src, public_dir, "story")
+        shot = {
+            "kind": kind, "path": path, "startFrame": elapsed,
+            "durationFrames": frames, "treatment": treatment,
+        }
+        if chapter:
+            shot["chapter"] = chapter
+        if caption:
+            shot["caption"] = caption
+        if kind == "video":
+            shot["sourceStartFrame"] = round(start * FPS)
+        shots.append(shot)
+        elapsed += frames
+    assert elapsed == story_frames
+    song_local = _copy_private(song_path, public_dir, "music")
+    opening = dict(opening)
+    opening["musicPath"] = song_local
+    opening["timing"] = {"matchcutEndFrame": matchcut_end, "songStartFrame": song_start}
+    props = {"opening": opening, "songDurationFrames": song_frames,
+             "endCardFrames": end_frames, "shots": shots}
+    props_path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = props_path.with_name(props_path.name + ".tmp")
+    temporary.write_text(json.dumps(props, ensure_ascii=False, indent=2), encoding="utf-8")
+    temporary.replace(props_path)
+    return props
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="승인한 로컬 사진·영상과 Suno 완성곡으로 본편 타임라인 생성")
+    parser.add_argument("--approved", type=Path, default=Path("data/approved-story.json"))
+    parser.add_argument("--opening-props", type=Path, default=Path("data/opening-props.json"))
+    parser.add_argument("--song", type=Path, required=True, help="로컬 최종 MP3/WAV 경로")
+    parser.add_argument("--public-dir", type=Path, default=Path("video/public"))
+    parser.add_argument("--props", type=Path, default=Path("data/film-props.json"))
+    parser.add_argument("--end-card-seconds", type=float, default=4)
+    args = parser.parse_args()
+    result = prepare_film(args.approved, args.opening_props, args.song,
+                          args.public_dir, args.props, args.end_card_seconds)
+    total = result["opening"]["timing"]["songStartFrame"] + result["songDurationFrames"]
+    print(f"완성곡 0초부터 재생 · 본편 {len(result['shots'])}샷 · 전체 {total}프레임 "
+          f"({total / FPS:.2f}초) · {args.props}")
+
+
+if __name__ == "__main__":
+    main()
