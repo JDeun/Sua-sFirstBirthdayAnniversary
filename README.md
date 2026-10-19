@@ -1,42 +1,37 @@
-# Sua's First Birthday Anniversary
+# 수아의 첫돌 성장영상 제작 프로젝트
 
-Privacy-first, **local-first** family media pipeline for a first-birthday film. This repository contains **code only**. Never upload family photos, videos, authentication secrets, or generated manifests to GitHub.
+Google Drive에 모인 가족 사진·영상을 **로컬에서 안전하게 수집하고**, 메타데이터로 시간순 정렬한 다음, 얼굴 정렬 매치컷과 Remotion 편집으로 첫돌 영상을 제작하는 프로젝트입니다.
 
-## What works in this scaffold
+> **중요:** 이 GitHub 저장소는 공개 상태입니다. 가족 사진·영상, Google Drive 접근 토큰, 개인 메타데이터, Suno 원음원 및 최종 렌더링 파일은 절대 GitHub에 올리지 않습니다. 원본은 수정하거나 삭제하지 않습니다.
 
-- Read photos/videos from a local directory, including a fully downloaded **Google Drive for desktop** folder.
-- Read capture timestamps from ExifTool, fall back to filenames, and preserve uncertainty instead of inventing dates.
-- Compute streaming SHA-256 for exact duplicates; optionally flag visually similar images with perceptual hashes. **No source files are deleted.**
-- Produce a chronological JSON manifest, with undated media kept at the end for human review.
-- Optionally download media recursively from a shared Drive folder with **read-only OAuth**.
-- Optionally face-align selected images using OpenCV YuNet for a growth match-cut (manual review still required).
-- Start a Remotion video project with an original, editable placeholder composition.
+## 현재 구현 상태
 
-## Vendor research and original motion-template previews
+| 항목 | 상태 |
+|---|---|
+| Google Drive 데스크톱 동기화 폴더 읽기 | 로컬 폴더 스캔 지원 |
+| Google Drive API 읽기 전용 OAuth 다운로드 | 코드 구현, 실제 계정 연결 테스트 필요 |
+| 사진·영상 EXIF/QuickTime 촬영일과 파일명 추론 | 구현 |
+| SHA-256 완전 중복 감지 | 구현, 자동 삭제하지 않음 |
+| 사진 해시 기반 유사 장면 후보 | 구현, 사람 검토 필수 |
+| 촬영일 기반 JSON 정렬 목록 | 구현 |
+| OpenCV YuNet 얼굴 정렬 PNG 생성 | 구현, 실제 영아 사진 검증 필요 |
+| **초고속 얼굴 매치컷 → 타이틀 → 벌스** | 18초 Remotion 데모 구현 |
+| 시네마틱 / 스크랩북 / 예능형 프리뷰 | 24초 데모 3종 구현 |
+| 사진 검토 UI·4분 완성본·음악 비트 분석 | 추후 개발 |
 
-Publicly documented first-birthday video references were compared in [Market Research](docs/MARKET_RESEARCH_2026-10.md), with the proposed **4-minute story plan** in [Template Spec](docs/TEMPLATE_SPEC.md).
+## 먼저 볼 문서
 
-Three original **24-second synthetic design previews** are included; none includes private family media or reproduces a commercial vendor's graphics:
+- [제작 방향과 4분짜리 스토리보드](docs/TEMPLATE_SPEC.md)
+- [초고속 얼굴 매치컷 오프닝 설계](docs/OPENING_MATCHCUT.md)
+- [Suno 직접 제작 음악 작업 가이드](docs/MUSIC_BRIEF.md)
+- [기존 돌영상 업체와 템플릿 조사](docs/MARKET_RESEARCH_2026-10.md)
+- [시스템 아키텍처와 단계별 개발 계획](docs/ARCHITECTURE.md)
+- [Codex 작업 지침](AGENTS.md)
+- [Remotion 영상 미리보기](video/README.md)
 
-- `CinematicPreview` — documentary / minimalist typography
-- `ScrapbookPreview` — paper collage / polaroid styling
-- `VarietyPreview` — bold captions / energetic motion
+## Mac에서 설치
 
-~~~bash
-cd video
-npm install
-npm run dev
-# Select any Preview composition in Remotion Studio.
-npx remotion render src/index.ts CinematicPreview out/cinematic-demo.mp4
-~~~
-
-For alternative renders and details, see [video/README.md](video/README.md). These are **style explorations**, not the final edited 4-minute film.
-
-## Requirements
-
-Python 3.11+, Node.js 20+, FFmpeg, ExifTool (recommended), and a local disk with enough space for downloads and rendering.
-
-On macOS:
+Python 3.11+, Node.js 20+, FFmpeg, ExifTool이 필요합니다.
 
 ~~~bash
 brew install ffmpeg exiftool
@@ -45,63 +40,100 @@ source .venv/bin/activate
 python -m pip install -e ".[images,drive,vision]"
 ~~~
 
-For **local Google Drive for desktop** sync, make the shared folder/files available offline first, then analyze the downloaded path:
+## 1단계 — 가족 사진·영상 수집과 정렬
+
+Google Drive에서 공유 폴더를 만들고, 가족 및 지인에게 **원본 파일을 업로드**하도록 안내합니다. Google Drive 데스크톱 앱으로 자료를 내려받고 *오프라인에서 사용 가능*하도록 준비한 뒤 다음 명령을 실행합니다.
 
 ~~~bash
-sua-media "/path/to/Google Drive/Family Birthday Uploads" --out data/manifest.json
+sua-media "/로컬/구글드라이브/공유폴더" --out data/manifest.json
 ~~~
 
-This creates a manifest of file paths, hashes, dates, provenance, exact duplicate groups, and visual-similarity candidates. Original media are not copied, altered, renamed, or deleted. A filename-derived date is a **clue**, particularly for KakaoTalk downloads; it is not automatically the camera's capture date.
+촬영 메타데이터가 없으면 파일명으로 추정합니다. 카카오톡 파일명의 날짜는 *촬영일이 아닌 저장·전달일일 수 있으므로 신뢰도를 낮게 기록*합니다. 알 수 없는 날짜는 임의로 만들지 않습니다.
 
-### Optional: direct read-only Drive download
+중복은 원본에서 삭제하지 않고 JSON에 중복 여부와 비슷한 사진 후보를 표시합니다.
 
-1. Create a Google Cloud project, enable **Google Drive API**, configure OAuth consent and a **Desktop** OAuth client, and save the downloaded credentials as `credentials.json` **locally**.
-2. Ensure the OAuth Google account has access to the shared folder.
-3. Locate its folder ID in the URL.
-4. Run:
+### 선택 — Google Drive API로 직접 받기
+
+1. Google Cloud 프로젝트에서 Google Drive API를 활성화합니다.
+2. OAuth 동의 화면 및 데스크톱 OAuth 클라이언트를 만든 후, 발급된 JSON을 로컬의 `credentials.json`으로 저장합니다.
+3. 사용 계정에 공유 폴더 접근 권한을 부여합니다.
+4. 브라우저에 보이는 폴더 ID로 아래 명령을 실행합니다.
 
 ~~~bash
-sua-drive YOUR_FOLDER_ID --credentials credentials.json --token .secrets/drive-token.json --out assets/incoming/drive --index data/drive-index.json
+sua-drive 폴더ID --credentials credentials.json \
+  --token .secrets/drive-token.json \
+  --out assets/incoming/drive --index data/drive-index.json
 sua-media assets/incoming/drive --out data/manifest.json
 ~~~
 
-The sync is **download-only**, skips Google-native docs, and does not delete local or Drive files. It names downloads with the Drive file ID to avoid collisions and writes an index mapping to original names and IDs. Token and all media directories are gitignored. Google Drive OAuth may require consent-screen setup or test-user registration.
+읽기 전용 다운로드입니다. 원격 파일을 수정하거나 삭제하지 않습니다. Drive의 수정 시각은 실제 촬영 시각으로 간주하지 않습니다.
 
-### Optional: face-aligned growth match-cut
+## 2단계 — 얼굴 정렬 매치컷 준비
 
-Download the OpenCV YuNet ONNX model to `models/face_detection_yunet_2023mar.onnx` from [opencv_zoo](https://github.com/opencv/opencv_zoo/tree/main/models/face_detection_yunet). Model files are not committed.
+[OpenCV YuNet 모델](https://github.com/opencv/opencv_zoo/tree/main/models/face_detection_yunet)을 내려받아 `models/face_detection_yunet_2023mar.onnx`에 저장합니다.
 
 ~~~bash
-sua-face-align --manifest data/manifest.json --model models/face_detection_yunet_2023mar.onnx --out output/faces
+sua-face-align --manifest data/manifest.json \
+  --model models/face_detection_yunet_2023mar.onnx \
+  --out output/faces
 ~~~
 
-This writes aligned PNGs and `report.json`. Photos with undetectable faces or multiple people need human review; output remains local. Face alignment transforms existing photos; it does not synthesize a new face.
+`output/faces/report.json`과 생성된 사진을 **사람이 검토**합니다. 원본의 아이가 아닌 다른 얼굴이 선택되거나 검출에 실패할 수 있습니다.
 
-### Video scaffold
+승인한 사진 목록을 `data/approved-matchcut.json` 파일로 만듭니다. 형식은 [예시](examples/approved-matchcut.example.json)를 참고하세요. **목록 순서가 재생 순서**이므로 출생부터 현재까지 직접 확인한 시간순으로 작성합니다.
+
+~~~bash
+sua-matchcut --report output/faces/report.json \
+  --approved data/approved-matchcut.json \
+  --public-dir video/public/media/matchcut \
+  --props data/opening-props.json
+~~~
+
+선택한 정렬본만 **로컬** `video/public/media/matchcut` 폴더로 복사합니다. 원본은 그대로 유지합니다.
+
+## 3단계 — 영상 프리뷰
 
 ~~~bash
 cd video
 npm install
 npm run dev
-# Later, after putting approved media in video/public/media:
-npm run render
 ~~~
 
-Video defaults to a simple 1920x1080, 30-fps placeholder. It is **not** yet an edited birthday film. The second phase adds a reviewed storyboard, scene timeline, audio, and actual media selections.
+Remotion Studio에서 다음 작품을 골라 볼 수 있습니다.
 
-## Safety
+- **OpeningSequence:** 0~9초 수십 장 매치컷 가속 → 9~12초 타이틀 → 12초부터 벌스 느낌의 본편 시작. 기본 48장 가상 그래픽 데모.
+- **CinematicPreview / ScrapbookPreview / VarietyPreview:** 서로 다른 디자인 24초 데모.
+- **BirthdayPreview:** 초기 20초 플레이스홀더.
 
-- Keep this repository **private if possible**, even though original files are ignored; commit only code and anonymized fixtures.
-- Do **not** paste private Drive folder URLs, OAuth tokens, identifying metadata, or family media into GitHub issues.
-- Never run automated destructive deduplication against source files. Only exclude copies in the eventual edit decision manifest.
-- AI code execution must use local paths and **must not upload media to external AI APIs**.
-- Treat timestamp and facial-position inferences as provisional and verify representative outputs.
+실제 승인 프레임을 반영하려면 저장소 루트 기준:
 
-## Tests
+~~~bash
+cd video
+npx remotion render src/index.ts OpeningSequence out/opening.mp4 \
+  --props=../data/opening-props.json
+~~~
+
+직접 만든 음악을 쓰려면 `video/public/media/music/intro.wav`에 복사한 뒤, `sua-matchcut`에 `--music media/music/intro.wav`를 추가하여 props를 다시 생성합니다. 오디오는 공개 저장소에 올리지 않습니다.
+
+**현재 코드는 18초 오프닝 데모이며, 4분짜리 실제 완성 영상은 아닙니다.** 음악의 실제 벌스 시작 시점에 맞춰 프레임 타이밍을 조정해야 합니다.
+
+## 개인정보·저작권·안전
+
+- Google Drive의 공유 권한은 꼭 필요한 사람에게만 줍니다.
+- GitHub에 올려야 하는 자료는 소스코드와 **합성 테스트 자료**만입니다.
+- 가족의 얼굴을 외부 이미지/AI API에 자동 전송하지 않습니다.
+- 원본을 삭제하거나 임의 변경하지 않으며 시각적 중복은 자동 삭제하지 않습니다.
+- 음악은 직접 제작하되 이용 범위·계정 플랜·상영/게시 조건을 확인합니다.
+- 최종 영상은 행사장 화면비와 재생 기기에서 직접 검수합니다.
+
+## 테스트
 
 ~~~bash
 python -m unittest discover -s tests -v
-cd video && npm install && npm run typecheck
+cd video
+npm install
+npm run typecheck
+npx remotion compositions src/index.ts
 ~~~
 
-Project operating instructions: [AGENTS.md](AGENTS.md). Planned work is tracked in GitHub issues.
+문의 없이 Codex가 작업을 이어갈 수 있도록 [AGENTS.md](AGENTS.md)에 절차를 정리했습니다.
