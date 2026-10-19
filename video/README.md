@@ -4,7 +4,7 @@
 
 | 컴포지션 ID | 분량 | 목적 |
 |---|---:|---|
-| `OpeningSequence` | 18초 | **초고속 매치컷 → 타이틀 → 벌스 느낌의 첫 장면** |
+| `OpeningSequence` | 18초 | **초고속 매치컷 → 타이틀 → 완성곡의 0초가 시작되는 첫 장면** |
 | `CinematicPreview` | 24초 | 감성 다큐멘터리·에디토리얼 |
 | `ScrapbookPreview` | 24초 | 종이/사진 카드 콜라주 |
 | `VarietyPreview` | 24초 | 강렬한 예능형 타이포그래피 |
@@ -32,21 +32,25 @@ cd video
 npx remotion render src/index.ts OpeningSequence out/opening.mp4 --props=../data/opening-props.json
 ~~~
 
-음악 파일을 넣었다면 프로젝트 루트에서 아래처럼 생성합니다.
+완성된 Suno 음악이 없다면 무음 데모를 유지할 수 있습니다. 음악 파일이 준비되면 아래처럼 설정합니다.
 
 ~~~bash
-sua-matchcut --approved data/approved-matchcut.json --music media/music/intro.wav
+sua-cold-open --props data/opening-props.json --title-at 9 --song-start 12 \
+  --music media/music/suno-final.wav
 ~~~
 
 `video/public/media/music/intro.wav`는 로컬 파일이어야 하며 GitHub에서 무시됩니다. Suno 등으로 사용자가 직접 제작한 음악 파일을 사용합니다.
 
 ~~~bash
-# 저장소 루트에서, 음악 청취로 확정한 타임코드 입력 (숫자는 예시)
-sua-audio-cues video/public/media/music/intro.wav --title-impact 9.2 --verse-start 12.5 \\
-  --props data/opening-props.json --music-relative media/music/intro.wav
+# 저장소 루트에서, 선택적으로 별도 효과음 지정
+sua-cold-open --props data/opening-props.json --title-at 9 --song-start 12 \
+  --music media/music/suno-final.wav \
+  --montage-sfx media/sfx/montage.wav --title-sfx media/sfx/title.wav
 ~~~
 
-`OpeningSequence`는 이제 props의 `timing`을 읽어 매치컷·타이틀·벌스 경계를 자동 변경합니다. 어택 후보는 보조 자료일 뿐 벌스 시작을 자동 확정하지 않습니다.
+효과음은 생략 가능하며 **매치컷 도중 Suno 음악은 재생하지 않습니다.**
+`song-start`는 완성곡의 파일 0초 시작 프레임이지 곡 내부 벌스의 시간표가 아닙니다.
+`sua-audio-cues`는 곡 전반의 편집 분석에 선택적으로 사용하며 콜드 오픈 설정에는 필요하지 않습니다.
 
 정확한 연출: [매치컷 오프닝](../docs/OPENING_MATCHCUT.md) · [Suno 음악 가이드](../docs/MUSIC_BRIEF.md) · [전체 스토리보드](../docs/TEMPLATE_SPEC.md).
 

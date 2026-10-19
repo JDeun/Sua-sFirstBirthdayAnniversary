@@ -15,7 +15,7 @@ Google Drive에 모인 가족 사진·영상을 **로컬에서 안전하게 수�
 | 사진 해시 기반 유사 장면 후보 | 구현, 사람 검토 필수 |
 | 촬영일 기반 JSON 정렬 목록 | 구현 |
 | OpenCV YuNet 얼굴 정렬 PNG 생성 | 구현, 실제 영아 사진 검증 필요 |
-| **초고속 얼굴 매치컷 → 타이틀 → 벌스** | 18초 Remotion 데모 구현 |
+| **무음/효과음 얼굴 매치컷 → 타이틀 → Suno 완성곡 시작** | 18초 Remotion 데모 구현 |
 | 시네마틱 / 스크랩북 / 예능형 프리뷰 | 24초 데모 3종 구현 |
 | 사진 검토 UI·4분 완성본·음악 비트 분석 | 추후 개발 |
 
@@ -102,7 +102,7 @@ npm run dev
 
 Remotion Studio에서 다음 작품을 골라 볼 수 있습니다.
 
-- **OpeningSequence:** 0~9초 수십 장 매치컷 가속 → 9~12초 타이틀 → 12초부터 벌스 느낌의 본편 시작. 기본 48장 가상 그래픽 데모.
+- **OpeningSequence:** 0~9초 수십 장 매치컷 가속 → 9~12초 타이틀 → 12초부터 Suno 완성곡을 0초부터 재생하며 본편 시작. 기본 48장 가상 그래픽 데모.
 - **CinematicPreview / ScrapbookPreview / VarietyPreview:** 서로 다른 디자인 24초 데모.
 - **BirthdayPreview:** 초기 20초 플레이스홀더.
 
@@ -118,26 +118,28 @@ npx remotion render src/index.ts OpeningSequence out/opening.mp4 \
 
 **현재 코드는 18초 오프닝 데모이며, 4분짜리 실제 완성 영상은 아닙니다.** 음악의 실제 벌스 시작 시점에 맞춰 프레임 타이밍을 조정해야 합니다.
 
-## 직접 제작한 음악으로 오프닝 동기화
+## Suno 웹에서 곡 완성 → 콜드 오픈 후 재생
 
-먼저 본인이 만든 Suno 음원을 Mac에 보관하고 `ffmpeg`로 분석합니다. 오디오를 업로드하지 않습니다.
+**Suno에 영상용 라이저나 프리코러스를 강제로 만들 필요가 없습니다.**
+영상 첫 9초는 수십 장 얼굴 정렬 매치컷(무음 또는 선택 효과음), 다음 3초는 타이틀이고,
+그 뒤에 **Suno 완성곡을 파일 0초부터** 재생합니다. 실제 음악을 받기 전까지는 데모만 볼 수 있습니다.
 
 ~~~bash
-# 1. 트랜지언트/어택 후보만 추출합니다. 벌스/코러스 구간 판정은 사람이 합니다.
-sua-audio-cues video/public/media/music/intro.wav --out data/audio-cues.json
+# 준비: 로컬에만 video/public/media/music/suno-final.wav 파일 보관
+sua-matchcut --approved data/approved-matchcut.json
+sua-cold-open --props data/opening-props.json \
+  --title-at 9 --song-start 12 \
+  --music media/music/suno-final.wav
 
-# 2. 실제 음악을 들으며 타이틀 악센트와 벌스 시작을 확정한 뒤 props에 기록합니다.
-sua-audio-cues video/public/media/music/intro.wav \\
-  --title-impact 9.2 --verse-start 12.5 \\
-  --props data/opening-props.json --music-relative media/music/intro.wav
-
-# 3. 로컬 오프닝 재렌더
 cd video
-npx remotion render src/index.ts OpeningSequence out/opening.mp4 \\
+npx remotion render src/index.ts OpeningSequence out/opening.mp4 \
   --props=../data/opening-props.json
 ~~~
 
-**중요:** 9.2초/12.5초는 사용 예시일 뿐이며 음악의 실제 시점이 아닙니다. 자세한 설명은 [음악 가이드](docs/MUSIC_BRIEF.md)를 참고하세요.
+선택적 효과음: `--montage-sfx media/sfx/montage.wav`, `--title-sfx media/sfx/title.wav`.
+효과음은 각 입력 파일을 로컬 `video/public/media/sfx/`에 두어야 합니다.
+`sua-audio-cues`는 곡의 어택 분석 보조 도구로 남겨두며, 콜드 오픈에는 필수가 아닙니다.
+더 자세한 설명은 [콜드 오픈 명세](docs/OPENING_MATCHCUT.md)와 [Suno 웹 제작 가이드](docs/MUSIC_BRIEF.md)를 참고하세요.
 
 ## awesome-ai-motion 스킬 활용
 

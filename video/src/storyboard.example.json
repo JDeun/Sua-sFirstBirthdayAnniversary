@@ -4,20 +4,67 @@
   "fps": 30,
   "duration_frames": 7200,
   "music": {
-    "source": "사용자 제작 음악 (별도 로컬 경로)",
-    "marker_status": "draft_unverified",
-    "title_impact_frame": 270,
-    "verse_start_frame": 360
+    "source": "별도 Suno 완성곡을 타이틀 뒤에 처음부터 재생",
+    "song_start_frame": 360,
+    "full_song_must_start_at_zero": true
   },
   "scenes": [
-    {"id": "matchcut", "type": "aligned-fast-cut", "start_frame": 0, "duration_frames": 270, "approved_asset_ids": []},
-    {"id": "title", "type": "title-beat", "start_frame": 270, "duration_frames": 90},
-    {"id": "birth", "type": "media-montage", "start_frame": 360, "duration_frames": 900, "approved_asset_ids": []},
-    {"id": "months_1_to_3", "type": "media-montage", "start_frame": 1260, "duration_frames": 1320},
-    {"id": "months_4_to_6", "type": "media-montage", "start_frame": 2580, "duration_frames": 1200},
-    {"id": "months_7_to_9", "type": "media-montage", "start_frame": 3780, "duration_frames": 1260},
-    {"id": "months_10_to_12", "type": "media-montage", "start_frame": 5040, "duration_frames": 1260},
-    {"id": "family_message", "type": "message", "start_frame": 6300, "duration_frames": 750},
-    {"id": "end", "type": "end-card", "start_frame": 7050, "duration_frames": 150}
+    {
+      "id": "matchcut",
+      "type": "aligned-fast-cut",
+      "start_frame": 0,
+      "duration_frames": 270,
+      "approved_asset_ids": [],
+      "audio": "optional_sfx_only"
+    },
+    {
+      "id": "title",
+      "type": "title-cold-open",
+      "start_frame": 270,
+      "duration_frames": 90
+    },
+    {
+      "id": "birth",
+      "type": "media-montage-song-start",
+      "start_frame": 360,
+      "duration_frames": 900,
+      "approved_asset_ids": []
+    },
+    {
+      "id": "months_1_to_3",
+      "type": "media-montage",
+      "start_frame": 1260,
+      "duration_frames": 1320
+    },
+    {
+      "id": "months_4_to_6",
+      "type": "media-montage",
+      "start_frame": 2580,
+      "duration_frames": 1200
+    },
+    {
+      "id": "months_7_to_9",
+      "type": "media-montage",
+      "start_frame": 3780,
+      "duration_frames": 1260
+    },
+    {
+      "id": "months_10_to_12",
+      "type": "media-montage",
+      "start_frame": 5040,
+      "duration_frames": 1260
+    },
+    {
+      "id": "family_message",
+      "type": "message",
+      "start_frame": 6300,
+      "duration_frames": 750
+    },
+    {
+      "id": "end",
+      "type": "end-card",
+      "start_frame": 7050,
+      "duration_frames": 150
+    }
   ]
 }
