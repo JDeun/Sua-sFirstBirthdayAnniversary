@@ -55,3 +55,20 @@ sua-cold-open --props data/opening-props.json --title-at 9 --song-start 12 \
 정확한 연출: [매치컷 오프닝](../docs/OPENING_MATCHCUT.md) · [Suno 음악 가이드](../docs/MUSIC_BRIEF.md) · [전체 스토리보드](../docs/TEMPLATE_SPEC.md).
 
 최종 4분짜리 실제 성장영상, 음악 비트 검출, 사진 검토 UI는 아직 구현 중인 개발 과제입니다.
+
+
+## 전체 영화 합성 컴포지션
+
+`BirthdayFilm`은 오프닝 데모와 달리 **완성된 MP3 길이를 자동 반영**합니다. 개인 사진·음원은 `video/public/media/`에 있는 로컬 사본만 사용합니다. 공개 CI에서는 합성 예제만 검증합니다.
+
+~~~bash
+# 저장소 루트에서 승인된 샷 목록으로 데이터 구성
+sua-film --approved data/approved-story.json   --opening-props data/opening-props.json   --song "/개인/음악/네가 빛날 우주 (2).mp3"   --props data/film-props.json
+
+cd video
+npx remotion render src/index.ts BirthdayFilm out/sua-birthday.mp4   --props=../data/film-props.json --codec=h264
+~~~
+
+장면은 `data/approved-story.json`에 승인된 순서로 이어집니다. 동영상 원본 소리는 음소거하며 음악은 콜드 오픈 뒤부터 한 번만 재생됩니다. 현재 기본 프리뷰는 합성 그래픽으로만 동작합니다.
+
+전체 가이드: [docs/FULL_FILM.md](../docs/FULL_FILM.md).
