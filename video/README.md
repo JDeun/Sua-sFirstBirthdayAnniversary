@@ -38,7 +38,15 @@ npx remotion render src/index.ts OpeningSequence out/opening.mp4 --props=../data
 sua-matchcut --approved data/approved-matchcut.json --music media/music/intro.wav
 ~~~
 
-`video/public/media/music/intro.wav`는 로컬 파일이어야 하며 GitHub에서 무시됩니다. Suno 등으로 사용자가 직접 제작한 음악 파일을 사용합니다. 마커를 자동으로 읽지는 못하므로 실제 음악에 맞춰 `src/opening/timing.ts`의 상수를 수정하세요.
+`video/public/media/music/intro.wav`는 로컬 파일이어야 하며 GitHub에서 무시됩니다. Suno 등으로 사용자가 직접 제작한 음악 파일을 사용합니다.
+
+~~~bash
+# 저장소 루트에서, 음악 청취로 확정한 타임코드 입력 (숫자는 예시)
+sua-audio-cues video/public/media/music/intro.wav --title-impact 9.2 --verse-start 12.5 \\
+  --props data/opening-props.json --music-relative media/music/intro.wav
+~~~
+
+`OpeningSequence`는 이제 props의 `timing`을 읽어 매치컷·타이틀·벌스 경계를 자동 변경합니다. 어택 후보는 보조 자료일 뿐 벌스 시작을 자동 확정하지 않습니다.
 
 정확한 연출: [매치컷 오프닝](../docs/OPENING_MATCHCUT.md) · [Suno 음악 가이드](../docs/MUSIC_BRIEF.md) · [전체 스토리보드](../docs/TEMPLATE_SPEC.md).
 

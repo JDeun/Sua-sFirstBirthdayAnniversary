@@ -20,6 +20,7 @@ import {
 export type OpeningSequenceProps = {
   imagePaths: string[];
   musicPath: string;
+  timing?: {matchcutEndFrame: number; verseStartFrame: number};
 };
 
 const demoPalettes = ['#E8C6B2', '#D7B399', '#CFAC92', '#D9BDA4', '#E2BDA8'];
@@ -76,13 +77,13 @@ const DemoAlignedPortrait: React.FC<{index: number}> = ({index}) => {
   );
 };
 
-const MatchCutMontage: React.FC<{imagePaths: string[]}> = ({imagePaths}) => {
+const MatchCutMontage: React.FC<{imagePaths: string[]; totalFrames: number}> = ({imagePaths, totalFrames}) => {
   const frame = useCurrentFrame();
   const isDemo = imagePaths.length === 0;
   const paths = isDemo ? Array.from({length: DEMO_COUNT}, (_, i) => String(i)) : imagePaths;
-  const durations = distributeAcceleratingCuts(paths.length, MATCHCUT_END_FRAME);
+  const durations = distributeAcceleratingCuts(paths.length, totalFrames);
   const index = findActiveCutIndex(durations, frame);
-  const progress = (frame + 1) / MATCHCUT_END_FRAME;
+  const progress = (frame + 1) / totalFrames;
 
   return (
     <AbsoluteFill style={{backgroundColor: '#242727'}}>
@@ -118,27 +119,41 @@ const MatchCutMontage: React.FC<{imagePaths: string[]}> = ({imagePaths}) => {
   );
 };
 
+/**
+ * 마스크 리빌: 타이틀 악센트에서 멈춘 뒤 읽을 시간을 확보합니다.
+ * awesome-ai-motion의 설계 원칙을 참고해 Remotion으로 독자 구현.
+ */
 const TitleBeat: React.FC = () => {
   const frame = useCurrentFrame();
-  const scale = interpolate(frame, [0, 10, 22], [0.96, 1.045, 1], {
-    extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+  const y = interpolate(frame, [0, 20], [115, 0], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
   });
-  const opacity = interpolate(frame, [0, 8], [0, 1], {
-    extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+  const subtitleOpacity = interpolate(frame, [16, 34], [0, 1], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
   });
   return (
     <AbsoluteFill style={{
       background: '#F4EEE7', color: '#333638',
       justifyContent: 'center', alignItems: 'center',
     }}>
-      <div style={{textAlign: 'center', opacity, transform: 'scale(' + scale + ')'}}>
+      <div style={{textAlign: 'center', maxWidth: 1720}}>
         <div style={{font: '500 28px Arial, sans-serif', letterSpacing: 12, color: '#A26E55'}}>
           OUR FIRST YEAR
         </div>
-        <div style={{font: '500 174px Georgia, serif', marginTop: 24, letterSpacing: -7}}>
-          Sua, One Year.
+        <div style={{overflow: 'hidden', marginTop: 24, height: 212}}>
+          <div style={{
+            font: '500 160px Georgia, serif', lineHeight: '204px',
+            letterSpacing: -7, transform: 'translateY(' + y + '%)',
+          }}>
+            Sua, One Year.
+          </div>
         </div>
-        <div style={{font: '500 45px Arial, sans-serif', marginTop: 24, letterSpacing: 3}}>
+        <div style={{
+          font: '500 45px Arial, sans-serif', marginTop: 18,
+          opacity: subtitleOpacity, letterSpacing: 3,
+        }}>
           수아의 첫 번째 이야기
         </div>
       </div>
@@ -176,19 +191,31 @@ const VerseBegins: React.FC = () => {
 export const OpeningSequence: React.FC<OpeningSequenceProps> = ({
   imagePaths,
   musicPath,
-}) => (
-  <AbsoluteFill>
-    <Sequence from={0} durationInFrames={MATCHCUT_END_FRAME}>
-      <MatchCutMontage imagePaths={imagePaths}/>
-    </Sequence>
-    <Sequence from={MATCHCUT_END_FRAME}
-      durationInFrames={VERSE_START_FRAME - MATCHCUT_END_FRAME}>
-      <TitleBeat/>
-    </Sequence>
-    <Sequence from={VERSE_START_FRAME}
-      durationInFrames={OPENING_DURATION_FRAMES - VERSE_START_FRAME}>
-      <VerseBegins/>
-    </Sequence>
-    {musicPath ? <Audio src={staticFile(musicPath)} volume={0.85}/> : null}
-  </AbsoluteFill>
-);
+  timing,
+}) => {
+  const matchcutEnd = timing?.matchcutEndFrame ?? MATCHCUT_END_FRAME;
+  const verseStart = timing?.verseStartFrame ?? VERSE_START_FRAME;
+  if (
+    !Number.isInteger(matchcutEnd) ||
+    !Number.isInteger(verseStart) ||
+    matchcutEnd < 2 ||
+    verseStart - matchcutEnd < 15 ||
+    verseStart >= OPENING_DURATION_FRAMES
+  ) {
+    throw new Error('오프닝 마커가 잘못되었습니다. --title-impact/--verse-start를 확인하세요.');
+  }
+  return (
+    <AbsoluteFill>
+      <Sequence from={0} durationInFrames={matchcutEnd}>
+        <MatchCutMontage imagePaths={imagePaths} totalFrames={matchcutEnd}/>
+      </Sequence>
+      <Sequence from={matchcutEnd} durationInFrames={verseStart - matchcutEnd}>
+        <TitleBeat/>
+      </Sequence>
+      <Sequence from={verseStart} durationInFrames={OPENING_DURATION_FRAMES - verseStart}>
+        <VerseBegins/>
+      </Sequence>
+      {musicPath ? <Audio src={staticFile(musicPath)} volume={0.85}/> : null}
+    </AbsoluteFill>
+  );
+};

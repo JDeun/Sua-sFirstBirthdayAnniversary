@@ -45,7 +45,22 @@
 }
 ~~~
 
-위 JSON은 **설계 예시**입니다. 현재 Remotion 코드는 음악을 자동 분석하지 않으며 `video/src/opening/timing.ts`의 상수를 편집해 타이밍을 맞추는 구조입니다. 나중에는 이 마커를 읽고 자동 렌더링하도록 개선할 예정입니다.
+위 JSON은 **설계 예시**입니다. 이제 `sua-audio-cues`가 **로컬 오디오의 순간 에너지 상승(어택 후보)**을 찾아줍니다. 음악의 의미 있는 '벌스 시작'을 자동 인식하는 기능은 아니므로 사용자가 귀로 확인한 시점을 명시적으로 입력해야 합니다.
+
+~~~bash
+# 준비: video/public/media/music/intro.wav에 사용자가 직접 만든 음악 파일 복사
+sua-audio-cues video/public/media/music/intro.wav --out data/audio-cues.json
+
+# 후보를 참고해 음악을 듣고 시점을 직접 승인한 후 입력 (시간은 예시)
+sua-audio-cues video/public/media/music/intro.wav \\
+  --title-impact 9.2 --verse-start 12.5 \\
+  --props data/opening-props.json --music-relative media/music/intro.wav
+
+cd video
+npx remotion render src/index.ts OpeningSequence out/opening.mp4 --props=../data/opening-props.json
+~~~
+
+`--props`를 지정하면 기존 승인 사진 `imagePaths`를 유지한 채 `timing.matchcutEndFrame`과 `timing.verseStartFrame`을 갱신합니다. 현재 18초 프리뷰 길이 안에서만 유효하며 전체 본편 타이밍은 후속 개발입니다. 음악 마커가 확정되지 않았다면 **9초/12초 기본 데모**를 유지합니다. 디코딩은 로컬 FFmpeg에서 수행합니다.
 
 ## Suno 이용 권리 확인
 
