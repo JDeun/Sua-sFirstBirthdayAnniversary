@@ -53,7 +53,7 @@ export const TEMPLATE_PRESETS: Record<TemplateId, TemplatePreset> = {
     name: 'BRIGHT VARIETY',
     tagline: 'HELLO, WORLD!',
     subtitle: '드디어 등장! 오늘의 주인공',
-    chapter: 'TODAY'S HIGHLIGHT',
+    chapter: "TODAY'S HIGHLIGHT",
     caption: '하루하루 레벨 업! 귀여움은 현재 진행형.',
     closing: 'TO BE CONTINUED…',
     background: '#2552A2',
