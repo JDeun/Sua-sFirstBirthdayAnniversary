@@ -21,6 +21,7 @@ sua-face-align = "sua_media.faces:main"
 sua-matchcut = "sua_media.matchcut:main"
 sua-audio-cues = "sua_media.audio_cues:main"
 sua-cold-open = "sua_media.cold_open:main"
+sua-film = "sua_media.film:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -1,0 +1,30 @@
+{
+  "shots": [
+    {
+      "source": "../assets/incoming/birth-first-hold.jpg",
+      "chapter": "처음 만난 날",
+      "caption": "세상에서 가장 작은 기적",
+      "weight": 1.5,
+      "treatment": "cinematic"
+    },
+    {
+      "source": "../assets/incoming/sleeping-together.jpg",
+      "chapter": "우리 셋의 아침",
+      "weight": 1.2,
+      "treatment": "cinematic"
+    },
+    {
+      "source": "../assets/incoming/laughing.mp4",
+      "chapter": "꺄르르",
+      "weight": 1,
+      "treatment": "scrapbook",
+      "start_seconds": 2
+    },
+    {
+      "source": "../assets/incoming/first-birthday.jpg",
+      "chapter": "수아의 첫 번째 생일",
+      "weight": 1.5,
+      "treatment": "cinematic"
+    }
+  ]
+}
