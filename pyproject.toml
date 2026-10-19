@@ -19,6 +19,7 @@ sua-media = "sua_media.catalog:main"
 sua-drive = "sua_media.drive:main"
 sua-face-align = "sua_media.faces:main"
 sua-matchcut = "sua_media.matchcut:main"
+sua-audio-cues = "sua_media.audio_cues:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -24,6 +24,7 @@ Google Drive에 모인 가족 사진·영상을 **로컬에서 안전하게 수�
 - [제작 방향과 4분짜리 스토리보드](docs/TEMPLATE_SPEC.md)
 - [초고속 얼굴 매치컷 오프닝 설계](docs/OPENING_MATCHCUT.md)
 - [Suno 직접 제작 음악 작업 가이드](docs/MUSIC_BRIEF.md)
+- [awesome-ai-motion 활용 검토](docs/MOTION_LIBRARY.md)
 - [기존 돌영상 업체와 템플릿 조사](docs/MARKET_RESEARCH_2026-10.md)
 - [시스템 아키텍처와 단계별 개발 계획](docs/ARCHITECTURE.md)
 - [Codex 작업 지침](AGENTS.md)
@@ -116,6 +117,31 @@ npx remotion render src/index.ts OpeningSequence out/opening.mp4 \
 직접 만든 음악을 쓰려면 `video/public/media/music/intro.wav`에 복사한 뒤, `sua-matchcut`에 `--music media/music/intro.wav`를 추가하여 props를 다시 생성합니다. 오디오는 공개 저장소에 올리지 않습니다.
 
 **현재 코드는 18초 오프닝 데모이며, 4분짜리 실제 완성 영상은 아닙니다.** 음악의 실제 벌스 시작 시점에 맞춰 프레임 타이밍을 조정해야 합니다.
+
+## 직접 제작한 음악으로 오프닝 동기화
+
+먼저 본인이 만든 Suno 음원을 Mac에 보관하고 `ffmpeg`로 분석합니다. 오디오를 업로드하지 않습니다.
+
+~~~bash
+# 1. 트랜지언트/어택 후보만 추출합니다. 벌스/코러스 구간 판정은 사람이 합니다.
+sua-audio-cues video/public/media/music/intro.wav --out data/audio-cues.json
+
+# 2. 실제 음악을 들으며 타이틀 악센트와 벌스 시작을 확정한 뒤 props에 기록합니다.
+sua-audio-cues video/public/media/music/intro.wav \\
+  --title-impact 9.2 --verse-start 12.5 \\
+  --props data/opening-props.json --music-relative media/music/intro.wav
+
+# 3. 로컬 오프닝 재렌더
+cd video
+npx remotion render src/index.ts OpeningSequence out/opening.mp4 \\
+  --props=../data/opening-props.json
+~~~
+
+**중요:** 9.2초/12.5초는 사용 예시일 뿐이며 음악의 실제 시점이 아닙니다. 자세한 설명은 [음악 가이드](docs/MUSIC_BRIEF.md)를 참고하세요.
+
+## awesome-ai-motion 스킬 활용
+
+<https://github.com/gongnyang/awesome-ai-motion>은 Remotion을 대체하는 도구가 아니라 모션 효과의 선택·매개변수·주의사항을 참고하는 가이드입니다. [활용 분석 및 Codex 스킬 연결 절차](docs/MOTION_LIBRARY.md)를 확인하세요. 원본 코드를 자동으로 복제하거나 개인 영상을 외부 서비스에 전송하지 않습니다.
 
 ## 개인정보·저작권·안전
 

@@ -34,6 +34,8 @@ Google Drive에서 모은 사진·영상으로 **전문 업체 수준의 성장�
 - `video/src/templates/`: 시네마틱/스크랩북/예능형 스타일 데모
 - `docs/OPENING_MATCHCUT.md`: 오프닝 상세 타임라인
 - `docs/MUSIC_BRIEF.md`: 음악 제작 및 큐 마커
+- `docs/MOTION_LIBRARY.md`: awesome-ai-motion의 Remotion 적용 범위·출처·라이선스
+- `src/sua_media/audio_cues.py`: 로컬 오디오 어택 후보, 사용자 확정 마커 프레임화
 
 ## 구현 순서
 
@@ -43,9 +45,13 @@ Google Drive에서 모은 사진·영상으로 **전문 업체 수준의 성장�
 4. `data/approved-matchcut.json`에 **출생부터 현재 순서로** 승인 사진 나열
 5. `sua-matchcut`으로 로컬 이미지 및 `data/opening-props.json` 작성
 6. `cd video && npm run dev`로 `OpeningSequence` 미리보기
-7. 사용자가 완성한 Suno 오디오의 음악 구조(인트로, 악센트, 벌스)를 분석하고 최종 타이밍에 맞춰 컷 리타이밍
+7. Suno 오디오를 로컬 `sua-audio-cues`로 분석하여 트랜지언트 **후보**만 추출. 벌스/타이틀 마커는 귀로 확인해 `--title-impact`, `--verse-start`로 승인하고 `opening-props.json` 타이밍을 갱신 (자동 구간 추정값을 확정 사실처럼 취급하지 않음)
 8. 전체 4분짜리 성장영상의 편집기·스토리보드와 연동
 9. `python -m unittest discover -s tests -v`, `cd video && npm run typecheck`, Remotion 번들 검사 실행
+
+## 모션 가이드 연동
+
+`awesome-ai-motion` 원본 저장소의 `SKILL.md`와 관련 효과 카드를 **선택적으로** 읽고, 의도·파라미터·과용 주의사항을 Remotion에 맞게 별도 재구현합니다. 스킬 설치는 사용자 로컬 Codex 환경에 별도로 해야 합니다. 특히 원본 GSAP 타임라인과 Remotion frame 시계의 혼용 및 제3자 라이선스를 검증해야 합니다.
 
 ## 검수 목표
 

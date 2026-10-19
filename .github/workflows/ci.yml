@@ -29,3 +29,5 @@ jobs:
       - run: npm run typecheck
       - name: Validate Remotion composition bundling
         run: npx remotion compositions src/index.ts
+      - name: Smoke-render synthetic opening frame
+        run: npx remotion still src/index.ts OpeningSequence out/opening-smoke.png --frame=280 --scale=0.25
