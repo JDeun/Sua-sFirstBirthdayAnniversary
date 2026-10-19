@@ -5,6 +5,7 @@ import {TemplateShowcase} from './templates/TemplateShowcase';
 import {DEMO_DURATION_FRAMES, type TemplateId} from './templates/presets';
 import {OpeningSequence, type OpeningSequenceProps} from './opening/OpeningSequence';
 import {OPENING_DURATION_FRAMES, OPENING_FPS} from './opening/timing';
+import {BirthdayFilm, filmDurationOf, type BirthdayFilmProps} from './film/BirthdayFilm';
 
 const VARIANTS: {id: TemplateId; compositionId: string}[] = [
   {id: 'cinematic', compositionId: 'CinematicPreview'},
@@ -17,6 +18,18 @@ const defaultOpeningProps: OpeningSequenceProps = {
   musicPath: '',
 };
 
+// Synthetic-only preview: the real film length comes from --props=../data/film-props.json.
+const defaultFilmProps: BirthdayFilmProps = {
+  opening: {
+    imagePaths: [],
+    musicPath: '',
+    timing: {matchcutEndFrame: 270, songStartFrame: 360},
+  },
+  songDurationFrames: 90 * OPENING_FPS,
+  endCardFrames: 120,
+  shots: [],
+};
+
 export const Root: React.FC = () => (
   <>
     <Composition
@@ -24,6 +37,16 @@ export const Root: React.FC = () => (
       component={OpeningSequence}
       defaultProps={defaultOpeningProps}
       durationInFrames={OPENING_DURATION_FRAMES}
+      fps={OPENING_FPS}
+      width={1920}
+      height={1080}
+    />
+    <Composition
+      id="BirthdayFilm"
+      component={BirthdayFilm}
+      defaultProps={defaultFilmProps}
+      calculateMetadata={({props}) => ({durationInFrames: filmDurationOf(props)})}
+      durationInFrames={filmDurationOf(defaultFilmProps)}
       fps={OPENING_FPS}
       width={1920}
       height={1080}
