@@ -2,7 +2,9 @@ import React from 'react';
 import {Composition} from 'remotion';
 import {BirthdayPreview} from './BirthdayPreview';
 import {TemplateShowcase} from './templates/TemplateShowcase';
-import {DEMO_DURATION_FRAMES, TEMPLATE_PRESETS, type TemplateId} from './templates/presets';
+import {DEMO_DURATION_FRAMES, type TemplateId} from './templates/presets';
+import {OpeningSequence, type OpeningSequenceProps} from './opening/OpeningSequence';
+import {OPENING_DURATION_FRAMES, OPENING_FPS} from './opening/timing';
 
 const VARIANTS: {id: TemplateId; compositionId: string}[] = [
   {id: 'cinematic', compositionId: 'CinematicPreview'},
@@ -10,8 +12,22 @@ const VARIANTS: {id: TemplateId; compositionId: string}[] = [
   {id: 'variety', compositionId: 'VarietyPreview'},
 ];
 
+const defaultOpeningProps: OpeningSequenceProps = {
+  imagePaths: [],
+  musicPath: '',
+};
+
 export const Root: React.FC = () => (
   <>
+    <Composition
+      id="OpeningSequence"
+      component={OpeningSequence}
+      defaultProps={defaultOpeningProps}
+      durationInFrames={OPENING_DURATION_FRAMES}
+      fps={OPENING_FPS}
+      width={1920}
+      height={1080}
+    />
     <Composition
       id="BirthdayPreview"
       component={BirthdayPreview}
@@ -34,6 +50,3 @@ export const Root: React.FC = () => (
     ))}
   </>
 );
-
-// Keep this import evaluated so nonexistent preset keys are caught by TS.
-void TEMPLATE_PRESETS;

@@ -1,35 +1,53 @@
-# Architecture and planned phases
+# 시스템 아키텍처 및 개발 로드맵
 
-## Data flow
-Trusted family contributors -> private shared Google Drive folder -> local Drive desktop cache OR read-only Drive API downloader -> immutable local media -> JSON inventory -> human review -> optional geometric match-cut frames -> Remotion composition -> local H.264/AAC export.
+## 데이터 흐름
 
-## Phase 0: Safety and repeatability (this PR)
-- Code-only public repository; privacy-oriented .gitignore.
-- Source-file preservation and cryptographic exact duplicate detection.
-- Timestamp precedence (embedded > filename > unknown), no destructive cleanup.
-- Fully local CLI and opt-in Drive downloader.
-- Optional face-alignment pipeline and Remotion preview scaffold.
+가족·지인 촬영 원본 → Google Drive 비공개 공유 폴더 → 로컬 Drive 동기화 폴더 또는 읽기 전용 API 다운로드 → 로컬 불변 원본 → 날짜/중복 매니페스트 → 사용자 검수 → 얼굴 정렬 프레임 → **초고속 매치컷 오프닝** → Remotion 성장영상 제작 → 로컬 MP4 렌더링
 
-## Phase 1: Curation
-- Generate contact sheets (images) and representative frames (videos).
-- Create a local-only review app to select/skip media, fix date buckets, and mark important moments.
-- Link Drive provenance metadata to media manifest after sync; do not confuse Drive modifiedTime with capture time.
-- Add regression fixtures for timezone conversions, duplicate HEIC/JPEG exports, downloaded file names, and video transcodes.
+실제 미디어, OAuth 토큰, 사진 해시·매니페스트·영상 출력 파일은 GitHub에서 제외합니다.
 
-## Phase 2: Editing
-- Define stable JSON storyboard schema with ordered segments, duration, captions, transitions, and audio.
-- Integrate approved media with Remotion, handling aspect ratio and mixed HDR/SDR.
-- Build a face-aligned match-cut segment from manually confirmed photos.
-- Add typography system and licensed BGM; render and inspect frame samples.
+## 0단계: 코드 기반 구축 — 완료
 
-## Phase 3: Quality
-- Automated black/silent frame checks, duration, audio loudness, dropped media detection, and visual inspection report.
-- Validate 1080p/30fps H.264/AAC MP4 on actual venue hardware.
-- Avoid pushing private footage or screenshots to CI artifacts.
+- 로컬 원본 손상 방지 및 SHA-256 완전 중복 감지
+- EXIF/QuickTime 메타데이터 우선, 파일명 보조, 불명확한 날짜의 불확실성 보존
+- Google Drive API 읽기 전용 다운로드 CLI
+- OpenCV YuNet 얼굴 정렬 및 Remotion 스캐폴딩
+- 합성 데이터 기반 단위 테스트·CI
 
-## Remaining design risks
-- Google Drive desktop streaming may be a placeholder until made available offline.
-- Metadata may be stripped by KakaoTalk, exported images, or transcoding.
-- YuNet can mis-detect infant/side-profile faces and select the wrong face when multiple are present.
-- A perceptual hash is only a review hint; no automated deletion.
-- Mixed phone HDR and portrait video require a tested SDR normalization/crop strategy.
+## 1단계: 디자인·음악·오프닝 — 부분 완료
+
+- 업체 상품/디자인 리서치와 자체 프리셋 3종
+- **초고속 매치컷 9초 → 타이틀 3초 → 벌스 진입** 18초 코드 프리뷰
+- 승인 프레임만 사본을 만드는 `sua-matchcut` CLI
+- 사용자가 직접 만든 Suno 음악을 넣을 오디오 입력 경로
+- 남은 작업: 실제 사진 프레임 검토, 음악 마커 반영, 시각적 렌더 품질 평가
+
+## 2단계: 자료 검토 UI — 미완료
+
+- 사진 콘택트시트/동영상 대표 프레임
+- 사람 직접 날짜/월령 보정, 중요도·제외 선택
+- 유사/중복 후보 비교 기능
+- 얼굴 검출 실패 및 다인물 사진 보정 워크플로
+- Drive 다운로드 인덱스와 메타데이터 매니페스트 연결
+
+## 3단계: 성장영상 본편 — 미완료
+
+- `storyboard.json` 단일 데이터 소스의 4분 전체 컴포지션
+- 장면별 사진/영상/가족음성/음악 레이어 구성
+- 세 가지 스타일 혼합, 타이틀, 스크랩북 장면, 부모 메시지
+- 사용자 음악의 벌스·코러스·악센트에 따른 리타이밍
+- 세로 영상/HDR/SDR/카카오톡 압축 영상 적응 처리
+
+## 4단계: 상영 검증 — 미완료
+
+- 실영상 프레임 샘플링, 검은 화면/무음·음량 점검
+- H.264/AAC MP4 1080p 및 현장 디스플레이에서 확인
+- 최종 음악 이용 범위, 모든 등장 인물 및 업로드 권한 검토
+
+## 주요 제약
+
+- Google Drive 데스크톱에서 오프라인 다운로드하지 않은 파일은 로컬 분석이 실패할 수 있습니다.
+- 카카오톡으로 전달된 자료는 실제 촬영 시점이 사라졌을 수 있습니다.
+- 영아 측면 얼굴이나 여러 사람이 같이 나오는 사진은 YuNet 자동 선택을 신뢰할 수 없습니다.
+- 로컬 데이터 기반 편집과 실제 최종 영상 렌더링은 아직 검증하지 않았습니다.
+- AI 모델을 통한 얼굴 합성/모핑은 기본 워크플로에 포함하지 않습니다.

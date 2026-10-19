@@ -1,0 +1,7 @@
+{
+  "설명": "예시 파일명만 기입했습니다. report.json에서 status=aligned인 파일을 직접 고른 뒤 data/approved-matchcut.json에 복사하세요. 순서가 재생 순서입니다.",
+  "approved_outputs": [
+    "0000_0123456789ab.png",
+    "0001_abcdef123456.png"
+  ]
+}

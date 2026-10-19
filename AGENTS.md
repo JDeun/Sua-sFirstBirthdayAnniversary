@@ -1,39 +1,55 @@
-# Agent instructions — Sua's First Birthday
+# Codex 작업 지침 — 수아 첫돌 성장영상
 
-## Mission
-Produce a professional, family-approved first-birthday growth video using source media gathered through Google Drive. Preserve provenance and privacy. This is a **local-first** project.
+## 목표
 
-## Absolute rules
-1. Never change, move, delete, rename, or deduplicate original media in place.
-2. Never push source media, previews, OAuth secrets, Drive indices, or generated manifests to GitHub.
-3. Do not upload personal media to remote AI APIs/services without explicit consent.
-4. Do not infer uncertain capture dates as established facts. Record source, precision, and confidence. KakaoTalk timestamps may represent forwarding or saving.
-5. Do not automatically discard visually similar frames, even when perceptual hashes match.
-6. Ask for human confirmation when chronology or identity is ambiguous; avoid ranking a child's face by an opaque aesthetic score.
-7. Face alignment must be **geometric only** by default, not generative face alteration.
-8. Never silently add third-party copyrighted music or unlicensed assets.
+Google Drive에서 모은 사진·영상으로 **전문 업체 수준의 성장영상**을 로컬에서 제작합니다. 일관된 디자인과 스토리텔링을 지키면서 원본·개인정보를 보호합니다. **모든 사용자용 안내·설계 문서는 한국어를 기본 언어로 작성합니다.** 파일 경로·명령·라이브러리 이름은 원어를 유지합니다.
 
-## Architecture
-- \`src/sua_media/catalog.py\`: local scan, date inference, duplicate candidate catalog.
-- \`src/sua_media/drive.py\`: **download-only** read-only OAuth Google Drive ingestion.
-- \`src/sua_media/faces.py\`: optional YuNet/landmark geometric aligner for selected photos.
-- \`video/\`: Remotion preview and rendering scaffold.
-- \`assets/\`, \`data/\`, \`output/\`, \`.secrets/\`: local, ignored personal data.
+## 이번에 확정된 연출 방향
 
-## Local workflow
-1. \`python -m pip install -e ".[images,drive,vision]"\`.
-2. Prefer a fully offline-available Drive desktop folder; otherwise run \`sua-drive\` after explicit local OAuth configuration.
-3. \`sua-media <downloaded-directory> --out data/manifest.json\`.
-4. Inspect duplicate candidates, uncertain dates, and representative frames before selecting media.
-5. Run \`sua-face-align\` on a reviewed subset; check each image manually.
-6. Build a storyboard and then Remotion edit. Render a small preview before 1080p output.
-7. \`python -m unittest discover -s tests -v\` and \`cd video && npm run typecheck\`.
+- **첫 장면은 초고속 Face-aligned Match Cut**입니다. 출생부터 첫돌까지 정면/유사 구도의 사진 수십 장을 기하학적으로 정렬하고 시간순으로 짧게 교체합니다.
+- 컷 속도가 서서히 빨라져 프리코러스 같은 에너지 상승을 만듭니다.
+- 빠른 성장 몽타주 이후 음악 악센트에 맞춰 짧은 **타이틀 카드**로 전환합니다.
+- **벌스가 시작되면** 조용하고 감성적인 성장 본편을 시작합니다. 지금의 9초 매치컷 / 3초 타이틀 / 12초 벌스 진입은 **음악 없는 임시값**입니다.
+- 음악은 사용자가 Suno 등의 도구로 직접 만듭니다. 오디오 샘플이나 음악을 저장소에 올리지 않습니다.
+- 최종 4분 스토리보드는 [docs/TEMPLATE_SPEC.md](docs/TEMPLATE_SPEC.md) 기준으로 갱신합니다.
 
-## Codex / Remotion
-Read current official Remotion Agent Skills before advanced animation work:
-\`npx -y skills@latest add remotion-dev/skills -g -y\`.
-Develop reusable comps for opening, age chapters, match-cut, parents' message, and ending.
-Do not render user data in public CI.
+## 절대 지킬 안전 규칙
 
-## Deliverable quality
-Story-led editing, 16:9 1080p, readable Korean text, consistent design, intentional audio mixing, still-image motion used sparingly, clean transitions, no stretched/cropped faces or black frames. Playback-test on the venue's equipment.
+1. 원본 사진·영상을 삭제, 이동, 덮어쓰기, 이름 바꾸기 하지 않습니다.
+2. 개인 이미지·영상·OAuth 토큰·Drive 인덱스·미리보기·매니페스트·음악·최종 MP4를 GitHub에 푸시하지 않습니다.
+3. 가족 미디어를 외부 AI/API에 명시적 동의 없이 업로드하지 않습니다.
+4. 날짜가 불확실하면 추정임을 명시합니다. 카카오톡의 날짜는 전달일일 수 있습니다.
+5. 시각적으로 비슷한 이미지를 자동 삭제하지 않습니다.
+6. 얼굴 정렬은 **기하학적 변환**만 사용하고 얼굴 생성·변형은 하지 않습니다.
+7. 아기 얼굴 검출 실패·잘못된 대상 선택·얼굴 잘림 등을 사용자 검토 대상으로 지정합니다.
+8. 사용자가 음악을 주기 전에는 임의 음원을 넣지 않습니다. 유료/무료 Suno 라이선스를 확인합니다.
+
+## 주요 파일
+
+- `src/sua_media/catalog.py`: 날짜 추정, 해시, 중복/유사 후보
+- `src/sua_media/drive.py`: Drive OAuth 읽기 전용 다운로드
+- `src/sua_media/faces.py`: OpenCV YuNet 기하학적 얼굴 정렬
+- `src/sua_media/matchcut.py`: 사람이 승인한 프레임만 Remotion용으로 복사
+- `video/src/opening/`: 가속 매치컷·타이틀·벌스 시작 예제
+- `video/src/templates/`: 시네마틱/스크랩북/예능형 스타일 데모
+- `docs/OPENING_MATCHCUT.md`: 오프닝 상세 타임라인
+- `docs/MUSIC_BRIEF.md`: 음악 제작 및 큐 마커
+
+## 구현 순서
+
+1. 로컬로 내려받은 Google Drive 폴더 분석: `sua-media 경로 --out data/manifest.json`
+2. 정확한 출생일·월령별 자료와 중요 사진을 검토
+3. YuNet으로 얼굴 정렬 후 실패/다인물 사진 제외 또는 수동 보정
+4. `data/approved-matchcut.json`에 **출생부터 현재 순서로** 승인 사진 나열
+5. `sua-matchcut`으로 로컬 이미지 및 `data/opening-props.json` 작성
+6. `cd video && npm run dev`로 `OpeningSequence` 미리보기
+7. 사용자가 완성한 Suno 오디오의 음악 구조(인트로, 악센트, 벌스)를 분석하고 최종 타이밍에 맞춰 컷 리타이밍
+8. 전체 4분짜리 성장영상의 편집기·스토리보드와 연동
+9. `python -m unittest discover -s tests -v`, `cd video && npm run typecheck`, Remotion 번들 검사 실행
+
+## 검수 목표
+
+1920×1080, 30fps, 안전 여백 5%, 깨끗한 한국어 텍스트, H.264/AAC MP4.
+초고속 사진은 **광과민성을 유발할 수 있는 번쩍임이 반복되지 않도록** 과도한 플래시 효과를 금지합니다.
+원본 사진의 비율·얼굴 위치를 확인하고 음악 레벨 및 컷 전환이 정확한지 검수합니다.
+개인 미디어를 공개 CI에 사용하지 않습니다.

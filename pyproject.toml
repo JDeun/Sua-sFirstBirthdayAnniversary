@@ -18,6 +18,7 @@ vision = ["opencv-python>=4.8,<5", "numpy>=1.26,<3", "Pillow>=10,<13"]
 sua-media = "sua_media.catalog:main"
 sua-drive = "sua_media.drive:main"
 sua-face-align = "sua_media.faces:main"
+sua-matchcut = "sua_media.matchcut:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
