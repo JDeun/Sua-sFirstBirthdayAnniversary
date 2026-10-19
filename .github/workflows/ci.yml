@@ -31,3 +31,5 @@ jobs:
         run: npx remotion compositions src/index.ts
       - name: Smoke-render synthetic opening frame
         run: npx remotion still src/index.ts OpeningSequence out/opening-smoke.png --frame=280 --scale=0.25
+      - name: Smoke-render synthetic full-film frame
+        run: npx remotion still src/index.ts BirthdayFilm out/film-smoke.png --frame=400 --scale=0.25
