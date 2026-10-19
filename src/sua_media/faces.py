@@ -28,6 +28,33 @@ def alignment_matrix(eyes: list[list[float]], width: int, height: int):
     return np.column_stack((rotate, shift))
 
 
+def select_time_spread(rows: list[dict], maximum: int) -> list[dict]:
+    """월별로 골고루 후보를 배분해 초반 사진만 몰리는 현상을 방지합니다.
+
+    검출 성공/아이 본인 여부의 판정이 아니라 분석할 *후보* 추출입니다.
+    """
+    if maximum < 1:
+        raise ValueError("--max는 1 이상이어야 합니다.")
+    candidates = sorted(
+        (row for row in rows if row.get("kind") == "photo"
+         and row.get("captured_at") and not row.get("duplicate_of")),
+        key=lambda row: (row["captured_at"], row["relative_path"]),
+    )
+    buckets: dict[str, list[dict]] = {}
+    for row in candidates:
+        key = row["captured_at"][:7]
+        buckets.setdefault(key, []).append(row)
+    selected: list[dict] = []
+    # 매 순회에서 각 촬영 월당 1장씩 선택해 최신 시기에도 후보가 남도록 함.
+    while len(selected) < maximum and any(buckets.values()):
+        for month in sorted(buckets):
+            if len(selected) >= maximum:
+                break
+            if buckets[month]:
+                selected.append(buckets[month].pop(0))
+    return sorted(selected, key=lambda row: (row["captured_at"], row["relative_path"]))
+
+
 def face_align_manifest(manifest: Path, model: Path, out: Path, maximum: int = 80) -> dict:
     try:
         import cv2
@@ -48,8 +75,7 @@ def face_align_manifest(manifest: Path, model: Path, out: Path, maximum: int = 8
     report = []
     detector = cv2.FaceDetectorYN.create(str(model), "", (320, 320), 0.8, 0.3, 5000)
 
-    selected = [row for row in rows if row["kind"] == "photo" and row["captured_at"]
-                and not row["duplicate_of"]][:maximum]
+    selected = select_time_spread(rows, maximum)
     for index, row in enumerate(selected):
         path = Path(row["path"])
         info = {"source": row["relative_path"], "captured_at": row["captured_at"]}
