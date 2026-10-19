@@ -54,6 +54,37 @@ class FilmTests(unittest.TestCase):
             prepare_film(approved, opening, song, base / "video" / "public", target)
             self.assertEqual(len(list((base / "video" / "public" / "media" / "story").glob("*"))), 2)
 
+    @patch("sua_media.film.probe_duration_seconds", return_value=9.0)
+    def test_editor_can_mark_lyric_synchronized_cuts(self, probe):
+        with tempfile.TemporaryDirectory() as root:
+            base = Path(root)
+            (base / "photo1.jpg").write_bytes(b"synthetic-one")
+            (base / "photo2.jpg").write_bytes(b"synthetic-two")
+            (base / "song.mp3").write_bytes(b"synthetic-audio")
+            opening = base / "opening.json"
+            opening.write_text(json.dumps({"imagePaths": []}), encoding="utf-8")
+            approval = base / "approved.json"
+            approval.write_text(json.dumps({"shots": [
+                {"source": "photo1.jpg", "cut_at_seconds": 0},
+                {"source": "photo2.jpg", "cut_at_seconds": 3},
+            ]}), encoding="utf-8")
+            film = prepare_film(
+                approval, opening, base / "song.mp3", base / "public",
+                base / "film-props.json", end_card_seconds=2,
+            )
+            self.assertEqual([x["startFrame"] for x in film["shots"]], [0, 90])
+            self.assertEqual([x["durationFrames"] for x in film["shots"]], [90, 120])
+
+            approval.write_text(json.dumps({"shots": [
+                {"source": "photo1.jpg", "cut_at_seconds": 0},
+                {"source": "photo2.jpg", "cut_at_seconds": 0.5},
+            ]}), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "최소 1초"):
+                prepare_film(
+                    approval, opening, base / "song.mp3", base / "public",
+                    base / "film-props.json", end_card_seconds=2,
+                )
+
     @patch("sua_media.film.probe_duration_seconds")
     def test_rejects_unavailable_video_without_creating_props(self, probe):
         probe.side_effect = [7.0, 1.0]
