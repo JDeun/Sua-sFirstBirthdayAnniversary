@@ -43,7 +43,9 @@ def propose_landmarks(path: Path, *, hop_seconds: float = 0.1,
         changes.append(max(0.0, math.log1p(energies[i]) - math.log1p(energies[i - 1])))
     positive = sorted(x for x in changes if x > 0)
     median = positive[len(positive) // 2] if positive else 0.0
-    threshold = max(0.15, median * sensitivity)
+    # A sparse track may have only two true onsets. Their amplitudes must not
+    # define a threshold higher than the onsets themselves.
+    threshold = max(0.15, median * sensitivity) if len(positive) >= 5 else 0.15
     candidates = sorted(
         ((score, i * hop / rate) for i, score in enumerate(changes)
          if score >= threshold and i * hop / rate > 0.5),
