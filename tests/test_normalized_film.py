@@ -41,3 +41,17 @@ class NormalizedFilmTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    @patch("sua_media.film.probe_duration_seconds", return_value=9.0)
+    def test_heic_requires_normalization(self, probe):
+        with tempfile.TemporaryDirectory() as root:
+            base = Path(root)
+            (base / "photo.heic").write_bytes(b"synthetic-heic")
+            (base / "song.mp3").write_bytes(b"synthetic-song")
+            approval = base / "approved.json"
+            approval.write_text(json.dumps({"shots": [{"source": "photo.heic"}]}))
+            opening = base / "opening.json"
+            opening.write_text(json.dumps({"imagePaths": []}))
+            with self.assertRaisesRegex(ValueError, "HEIC/HEIF"):
+                prepare_film(approval, opening, base / "song.mp3",
+                             base / "public", base / "film.json", end_card_seconds=2)
