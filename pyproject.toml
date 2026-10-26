@@ -24,6 +24,7 @@ sua-cold-open = "sua_media.cold_open:main"
 sua-film = "sua_media.film:main"
 sua-music-analyze = "sua_media.music_analysis:main"
 sua-music-cuts = "sua_media.music_cuts:main"
+sua-music-draft = "sua_media.music_draft:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
