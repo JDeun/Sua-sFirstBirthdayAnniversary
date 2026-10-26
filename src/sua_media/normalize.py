@@ -21,7 +21,11 @@ def normalize(source: Path, output_dir: Path) -> Path:
         raise ValueError(f"미디어 검사 실패: {source.name}: {report['warnings']}")
     kind = ("video" if source.suffix.lower() in VIDEO_EXT else
             "audio" if source.suffix.lower() in AUDIO_EXT else "image")
-    digest = hashlib.sha256(source.read_bytes()).hexdigest()
+    hasher = hashlib.sha256()
+    with source.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            hasher.update(block)
+    digest = hasher.hexdigest()
     ext = {"video": ".mp4", "audio": ".wav", "image": ".png"}[kind]
     destination = output_dir.resolve() / (digest + ext)
     destination.parent.mkdir(parents=True, exist_ok=True)
