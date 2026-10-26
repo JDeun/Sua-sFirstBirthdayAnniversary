@@ -22,6 +22,10 @@ def plan_cuts(shot_count: int, story_seconds: float, landmarks: list[float],
            not math.isfinite(t) or not 0 < t < story_seconds for t in landmarks):
         raise ValueError("Landmarks must lie strictly inside the story duration")
     candidates = sorted(set(float(t) for t in landmarks))
+    if shot_count == 1:
+        return [0.0]
+    if len(candidates) < shot_count - 1:
+        raise ValueError("Insufficient musical landmarks for the requested shot count")
     # Dynamic programming avoids greedy early choices that leave no room later.
     # Cost penalizes distance from even pacing, while enforcing minimum duration.
     states = [(0.0, 0.0, [])]
