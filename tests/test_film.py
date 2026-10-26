@@ -105,6 +105,39 @@ class FilmTests(unittest.TestCase):
                 prepare_film(approved, opening, base / "song.mp3", base / "public", target)
             self.assertFalse(target.exists())
 
+    @patch("sua_media.film.probe_duration_seconds")
+    def test_birth_footage_duration_and_path(self, probe):
+        with tempfile.TemporaryDirectory() as root:
+            base = Path(root)
+            public = base / "public"
+            (public / "media" / "birth").mkdir(parents=True)
+            (public / "media" / "birth" / "clip.mp4").write_bytes(b"synthetic-clip")
+            (base / "photo.jpg").write_bytes(b"synthetic-photo")
+            (base / "song.mp3").write_bytes(b"synthetic-song")
+            approved = base / "approved.json"
+            approved.write_text(json.dumps({"shots": [{"source": "photo.jpg"}]}))
+            opening = base / "opening.json"
+            opening.write_text(json.dumps({
+                "imagePaths": [], "timing": {
+                    "matchcutEndFrame": 240, "birthEndFrame": 360, "songStartFrame": 450},
+                "birthClip": {"path": "media/birth/clip.mp4", "sourceStartFrame": 30}
+            }))
+            target = base / "out.json"
+            probe.side_effect = [9.0, 4.0]
+            with self.assertRaisesRegex(ValueError, "탄생 영상 길이"):
+                prepare_film(approved, opening, base / "song.mp3", public, target, 2)
+            self.assertFalse(target.exists())
+            probe.side_effect = [9.0, 6.0]
+            result = prepare_film(approved, opening, base / "song.mp3", public, target, 2)
+            self.assertEqual(result["opening"]["birthClip"]["path"], "media/birth/clip.mp4")
+            self.assertTrue(target.is_file())
+            opening.write_text(json.dumps({
+                "imagePaths": [], "birthClip": {"path": "media/../secret.mp4"}
+            }))
+            probe.side_effect = [9.0]
+            with self.assertRaisesRegex(ValueError, "탄생 영상 경로"):
+                prepare_film(approved, opening, base / "song.mp3", public, target, 2)
+
     @patch("sua_media.film.probe_duration_seconds", return_value=8)
     def test_path_traversal_source_not_automatically_available(self, probe):
         with tempfile.TemporaryDirectory() as root:
