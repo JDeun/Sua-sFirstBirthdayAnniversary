@@ -31,6 +31,8 @@ def inspect_render(path: Path, expected_frames: int, fps: int = 30,
     if not audios:
         errors.append("audio stream missing")
     for stream in videos:
+        if stream.get("codec_name") != "h264":
+            errors.append(f"video codec mismatch: {stream.get('codec_name')} expected=h264")
         rate = stream.get("avg_frame_rate", "0/0")
         try:
             numerator, denominator = (int(x) for x in rate.split("/"))
@@ -39,6 +41,9 @@ def inspect_render(path: Path, expected_frames: int, fps: int = 30,
                 errors.append(f"frame rate mismatch: {rate} expected={fps}")
         except (ValueError, ZeroDivisionError):
             errors.append(f"invalid video frame rate: {rate}")
+    for stream in audios:
+        if stream.get("codec_name") != "aac":
+            errors.append(f"audio codec mismatch: {stream.get('codec_name')} expected=aac")
     duration = float(data.get("format", {}).get("duration", 0))
     if not math.isfinite(duration) or abs(duration - expected_frames / fps) > duration_tolerance_frames / fps:
         errors.append(f"duration mismatch: actual={duration:.3f}s expected={expected_frames / fps:.3f}s")
