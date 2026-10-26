@@ -16,7 +16,7 @@ import subprocess
 from .normalize import normalize
 
 FPS = 30
-IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".webp"}
+IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"}
 VIDEO_SUFFIXES = {".mp4", ".mov", ".m4v"}
 AUDIO_SUFFIXES = {".mp3", ".wav", ".m4a", ".aac"}
 
@@ -212,6 +212,10 @@ def prepare_film(
         required = (birth_end - matchcut_end) / FPS
         if offset / FPS + required > probe_duration_seconds(candidate) + 0.033:
             raise ValueError("탄생 영상 길이가 할당된 구간보다 짧습니다.")
+    if not normalize_media:
+        heic = [src.name for src, kind, *_ in validated if kind == "image" and src.suffix.lower() in {".heic", ".heif"}]
+        if heic:
+            raise ValueError("HEIC/HEIF 사진은 --normalize-media 옵션이 필요합니다: " + ", ".join(heic))
     # All input validation precedes private asset conversion. The normalized
     # files are local derivatives; source originals are never modified.
     if normalize_media:
