@@ -34,8 +34,8 @@ class FilmTests(unittest.TestCase):
             ]}), encoding="utf-8")
             opening = base / "opening.json"
             opening.write_text(json.dumps({"imagePaths": ["media/matchcut/1.png"],
-                "musicPath": "", "timing": {"matchcutEndFrame": 270,
-                    "songStartFrame": 360}}), encoding="utf-8")
+                "musicPath": "", "timing": {"matchcutEndFrame": 240, "birthEndFrame": 360,
+                    "songStartFrame": 450}}), encoding="utf-8")
             target = base / "data" / "film-props.json"
             result = prepare_film(approved, opening, song, base / "video" / "public", target)
             self.assertEqual(result["songDurationFrames"], 362)
@@ -44,7 +44,7 @@ class FilmTests(unittest.TestCase):
             self.assertEqual(result["shots"][1]["startFrame"],
                              result["shots"][0]["durationFrames"])
             self.assertEqual(sum(x["durationFrames"] for x in result["shots"]), 242)
-            self.assertEqual(result["opening"]["timing"]["songStartFrame"], 360)
+            self.assertEqual(result["opening"]["timing"]["songStartFrame"], 450)
             self.assertTrue((base / "video" / "public" /
                 result["opening"]["musicPath"]).is_file())
             self.assertEqual((photos / "birth.jpg").read_bytes(), b"birth-photo-test-only")
@@ -98,8 +98,8 @@ class FilmTests(unittest.TestCase):
             ]}), encoding="utf-8")
             opening = base / "opening.json"
             opening.write_text(json.dumps({"imagePaths": [],
-                "timing": {"matchcutEndFrame": 270,
-                    "songStartFrame": 360}}), encoding="utf-8")
+                "timing": {"matchcutEndFrame": 240, "birthEndFrame": 360,
+                    "songStartFrame": 450}}), encoding="utf-8")
             target = base / "data" / "props.json"
             with self.assertRaisesRegex(ValueError, "동영상 길이"):
                 prepare_film(approved, opening, base / "song.mp3", base / "public", target)
