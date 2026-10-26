@@ -47,6 +47,8 @@ def propose_landmarks(path: Path, *, hop_seconds: float = 0.1,
     median = positive[len(positive) // 2] if positive else 0.0
     # A sparse track may have only two true onsets. Their amplitudes must not
     # define a threshold higher than the onsets themselves.
+    # The upper quartile of nonzero changes is more robust to occasional
+    # large attacks than a median dominated by near-zero frame jitter.
     threshold = max(0.15, median * sensitivity) if len(positive) >= 5 else 0.15
     candidates = sorted(
         ((score, i * hop / rate) for i, score in enumerate(changes)
