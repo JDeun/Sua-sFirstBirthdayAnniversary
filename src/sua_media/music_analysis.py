@@ -53,13 +53,14 @@ def propose_landmarks(path: Path, *, hop_seconds: float = 0.1,
     )
     selected = []
     for _, second in candidates:
-        if all(abs(second - existing) >= min_gap_seconds for existing in selected):
+        if second < total / rate - 0.5 and all(abs(second - existing) >= min_gap_seconds for existing in selected):
             selected.append(round(second, 3))
     return {
         "seconds": sorted(selected),
         "analysis": "positive_log_rms_novelty",
         "status": "unreviewed_candidates",
         "duration_seconds": round(total / rate, 3),
+        "warning": "RMS onset candidates only; verify beats, sections and lyrics manually",
         "parameters": {"hop_seconds": hop_seconds, "min_gap_seconds": min_gap_seconds,
                        "sensitivity": sensitivity},
     }
