@@ -1,11 +1,12 @@
 import math
+import subprocess
 import struct
 import tempfile
 import unittest
 import wave
 from pathlib import Path
 
-from sua_media.music_analysis import propose_landmarks
+from sua_media.music_analysis import propose_landmarks, analyze_audio
 
 
 class MusicAnalysisTests(unittest.TestCase):
@@ -38,3 +39,15 @@ class MusicAnalysisTests(unittest.TestCase):
     def test_rejects_invalid_parameters(self):
         with self.assertRaises(ValueError):
             propose_landmarks(Path("unused.wav"), hop_seconds=float("nan"))
+
+    def test_mp3_is_decoded_locally_and_analyzed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            wav_path = Path(tmp) / "bursts.wav"
+            mp3_path = Path(tmp) / "bursts.mp3"
+            self.make_wav(wav_path)
+            subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                            "-i", str(wav_path), str(mp3_path)],
+                           check=True, capture_output=True)
+            result = analyze_audio(mp3_path, min_gap_seconds=0.8)
+            self.assertTrue(any(abs(x - 1) < 0.3 for x in result["seconds"]))
+            self.assertTrue(any(abs(x - 3) < 0.3 for x in result["seconds"]))
