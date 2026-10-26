@@ -52,3 +52,8 @@ jobs:
           npx remotion render src/index.ts OpeningSequence out/birth-integration.mp4 --props=/tmp/ci-opening-props.json --frames=235-465 --scale=0.25 --codec=h264 --concurrency=2
           ffprobe -v error -show_entries stream=codec_type -of csv=p=0 out/birth-integration.mp4 | grep -q audio
           python ../scripts/check_audio_boundaries.py out/birth-integration.mp4
+
+      - name: Render complete synthetic BirthdayFilm (scaled CI preview)
+        run: |
+          npx remotion render src/index.ts BirthdayFilm out/full-synthetic-film.mp4 --scale=0.125 --codec=h264 --concurrency=2
+          python ../scripts/check_final_render.py out/full-synthetic-film.mp4 --expected-frames=3150
