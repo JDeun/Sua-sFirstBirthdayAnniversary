@@ -127,7 +127,8 @@ def prepare_film(
     matchcut_end = marker.get("matchcutEndFrame", 240)
     song_start = marker.get("songStartFrame", marker.get("verseStartFrame", 450))
     birth_end = marker.get("birthEndFrame", matchcut_end + 120)
-    if not (isinstance(matchcut_end, int) and isinstance(birth_end, int) and isinstance(song_start, int) and
+    if not (all(isinstance(value, int) and not isinstance(value, bool)
+                for value in (matchcut_end, birth_end, song_start)) and
             matchcut_end >= 2 and matchcut_end < birth_end and birth_end + 15 <= song_start < 630):
         raise ValueError("콜드 오픈 마커가 유효하지 않습니다.")
     song_path = song_path.expanduser().resolve()
@@ -178,7 +179,7 @@ def prepare_film(
             if isinstance(cut, bool) or not isinstance(cut, (int, float)) or not math.isfinite(cut) or cut < 0:
                 raise ValueError(f"샷 {i}: cut_at_seconds는 0 이상의 숫자여야 합니다.")
             starts.append(round(cut * FPS))
-        if starts[0] != 0:
+        if entries[0]["cut_at_seconds"] != 0:
             raise ValueError("첫 번째 샷은 노래 시작인 cut_at_seconds=0이어야 합니다.")
         durations = [
             end - start for start, end in zip(starts, starts[1:] + [story_frames])
