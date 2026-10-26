@@ -55,8 +55,12 @@ def produce(*, approved: Path, opening_props: Path, song: Path, public_dir: Path
         if output.exists():
             output.unlink()
         raise
+    qa = json.loads(report.read_text(encoding="utf-8"))
+    if qa.get("status") != "pass":
+        output.unlink(missing_ok=True)
+        raise RuntimeError(f"Final QA did not pass; see diagnostic report: {report}")
     return {"output": str(output), "report": str(report), "expected_frames": expected_frames,
-            "qa": json.loads(report.read_text(encoding="utf-8"))}
+            "qa": qa}
 
 
 def main() -> None:
