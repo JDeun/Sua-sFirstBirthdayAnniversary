@@ -198,7 +198,7 @@ def prepare_film(
         relative = birth_clip.get("path")
         offset = birth_clip.get("sourceStartFrame", 0)
         if (not isinstance(relative, str) or not relative.startswith("media/") or
-                "\\\\" in relative or any(part in (".", "..") for part in Path(relative).parts) or
+                "\\" in relative or any(part in (".", "..") for part in Path(relative).parts) or
                 Path(relative).suffix.lower() not in VIDEO_SUFFIXES):
             raise ValueError("탄생 영상 경로는 public/media 내부의 동영상이어야 합니다.")
         if isinstance(offset, bool) or not isinstance(offset, int) or offset < 0:
