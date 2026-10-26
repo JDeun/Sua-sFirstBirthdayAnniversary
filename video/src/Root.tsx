@@ -23,7 +23,7 @@ const defaultFilmProps: BirthdayFilmProps = {
   opening: {
     imagePaths: [],
     musicPath: '',
-    timing: {matchcutEndFrame: 270, songStartFrame: 360},
+    timing: {matchcutEndFrame: 240, birthEndFrame: 360, songStartFrame: 450},
   },
   songDurationFrames: 90 * OPENING_FPS,
   endCardFrames: 120,
