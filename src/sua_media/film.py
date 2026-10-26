@@ -121,10 +121,11 @@ def prepare_film(
     if not isinstance(opening, dict) or not isinstance(opening.get("imagePaths"), list):
         raise ValueError("먼저 sua-matchcut으로 opening-props.json을 만드세요.")
     marker = opening.get("timing") or {}
-    matchcut_end = marker.get("matchcutEndFrame", 270)
-    song_start = marker.get("songStartFrame", marker.get("verseStartFrame", 360))
-    if not (isinstance(matchcut_end, int) and isinstance(song_start, int) and
-            matchcut_end >= 2 and matchcut_end + 15 <= song_start < 540):
+    matchcut_end = marker.get("matchcutEndFrame", 240)
+    song_start = marker.get("songStartFrame", marker.get("verseStartFrame", 450))
+    birth_end = marker.get("birthEndFrame", matchcut_end + 120)
+    if not (isinstance(matchcut_end, int) and isinstance(birth_end, int) and isinstance(song_start, int) and
+            matchcut_end >= 2 and matchcut_end < birth_end and birth_end + 15 <= song_start < 630):
         raise ValueError("콜드 오픈 마커가 유효하지 않습니다.")
     song_path = song_path.expanduser().resolve()
     if not song_path.is_file() or song_path.suffix.lower() not in AUDIO_SUFFIXES:
@@ -208,7 +209,7 @@ def prepare_film(
     song_local = _copy_private(song_path, public_dir, "music")
     opening = dict(opening)
     opening["musicPath"] = song_local
-    opening["timing"] = {"matchcutEndFrame": matchcut_end, "songStartFrame": song_start}
+    opening["timing"] = {"matchcutEndFrame": matchcut_end, "birthEndFrame": birth_end, "songStartFrame": song_start}
     props = {"opening": opening, "songDurationFrames": song_frames,
              "endCardFrames": end_frames, "shots": shots}
     props_path.parent.mkdir(parents=True, exist_ok=True)
