@@ -1,11 +1,11 @@
 /** 음악의 실제 진입점을 확인한 뒤 프레임 수를 교체할 수 있는 설정. */
 export const OPENING_FPS = 30;
-export const MATCHCUT_END_FRAME = 9 * OPENING_FPS;
-export const SONG_START_FRAME = 12 * OPENING_FPS; // Suno 곡 파일의 0초 시작 지점
-export const OPENING_DURATION_FRAMES = 18 * OPENING_FPS;
+export const MATCHCUT_END_FRAME = 8 * OPENING_FPS;
+export const SONG_START_FRAME = 15 * OPENING_FPS; // Suno 곡 파일의 0초 시작 지점
+export const OPENING_DURATION_FRAMES = 21 * OPENING_FPS;
 
 /**
- * 사진은 시간순으로 주어졌다는 전제. 초반보다 후반이 빠르게 전환되도록
+ * 사진은 현재에서 출생 순으로 주어졌다는 전제. 초반보다 후반이 빠르게 전환되도록
  * 정수 프레임을 배분하며, 모든 사진에 최소 2프레임을 보장한다.
  */
 export const distributeAcceleratingCuts = (
