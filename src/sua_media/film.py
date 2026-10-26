@@ -248,7 +248,9 @@ def main() -> None:
     parser.add_argument("--song", type=Path, required=True, help="로컬 최종 MP3/WAV 경로")
     parser.add_argument("--public-dir", type=Path, default=Path("video/public"))
     parser.add_argument("--props", type=Path, default=Path("data/film-props.json"))
-    parser.add_argument("--end-card-seconds", type=float, default=4)\n    parser.add_argument("--normalize-media", action="store_true",\n                        help="원본을 보존하고 편집용 PNG/MP4/WAV 사본을 생성")
+    parser.add_argument("--end-card-seconds", type=float, default=4)
+    parser.add_argument("--normalize-media", action="store_true",
+                        help="원본을 보존하고 편집용 PNG/MP4/WAV 사본을 생성")
     args = parser.parse_args()
     result = prepare_film(args.approved, args.opening_props, args.song,
                           args.public_dir, args.props, args.end_card_seconds, args.normalize_media)
