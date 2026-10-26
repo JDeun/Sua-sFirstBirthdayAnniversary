@@ -17,9 +17,14 @@ class MusicCutsTests(unittest.TestCase):
         self.assertEqual(plan_cuts(3, 9, [1, 3, 3.5, 6]), [0.0, 3.0, 6.0])
 
     def test_rejects_invalid_landmarks(self):
-        for landmarks in ([0], [12], [-1], [True]):
+        for landmarks in ([0], [12], [-1], [True], [float("nan")], [float("inf")]):
             with self.subTest(landmarks=landmarks), self.assertRaises(ValueError):
                 plan_cuts(2, 12, landmarks)
 
     def test_single_shot(self):
         self.assertEqual(plan_cuts(1, 6, []), [0.0])
+
+    def test_nonfinite_story_length(self):
+        for length in (float("nan"), float("inf"), float("-inf")):
+            with self.subTest(length=length), self.assertRaises(ValueError):
+                plan_cuts(2, length, [1])
