@@ -48,8 +48,8 @@ export const songStartOf = (props: BirthdayFilmProps): number =>
 
 export const filmDurationOf = (props: BirthdayFilmProps): number => {
   const songStart = songStartOf(props);
-  if (!Number.isInteger(songStart) || songStart < 1 || songStart >= 540) {
-    throw new Error('완성곡 시작 시점은 오프닝 18초 안의 정수 프레임이어야 합니다.');
+  if (!Number.isInteger(songStart) || songStart < 1 || songStart >= 630) {
+    throw new Error('완성곡 시작 시점은 오프닝 21초 안의 정수 프레임이어야 합니다.');
   }
   if (!Number.isInteger(props.songDurationFrames) || props.songDurationFrames <= 0) {
     throw new Error('songDurationFrames는 양의 정수여야 합니다.');
@@ -186,7 +186,7 @@ const demoShots = (storyFrames: number): FilmShot[] => {
 };
 
 /**
- * Final film: silent matchcut -> title -> complete song from audio sample 0
+ * Final film: reverse matchcut -> birth footage -> title -> complete song from audio sample 0
  * with user-approved chronological photos/clips. No generated child imagery.
  */
 export const BirthdayFilm: React.FC<BirthdayFilmProps> = (props) => {
