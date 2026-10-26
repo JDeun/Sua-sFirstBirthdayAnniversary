@@ -13,6 +13,8 @@ from pathlib import Path
 import shutil
 import subprocess
 
+from .normalize import normalize
+
 FPS = 30
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".webp"}
 VIDEO_SUFFIXES = {".mp4", ".mov", ".m4v"}
@@ -106,6 +108,7 @@ def prepare_film(
     public_dir: Path,
     props_path: Path,
     end_card_seconds: float = 4.0,
+    normalize_media: bool = False,
 ) -> dict:
     """Build a film whose song plays once from t=0, after the silent cold open.
 
@@ -209,8 +212,7 @@ def prepare_film(
         required = (birth_end - matchcut_end) / FPS
         if offset / FPS + required > probe_duration_seconds(candidate) + 0.033:
             raise ValueError("탄생 영상 길이가 할당된 구간보다 짧습니다.")
-    shots = []
-    elapsed = 0
+    # All input validation precedes private asset conversion. The normalized\n    # files are local derivatives; source originals are never modified.\n    if normalize_media:\n        normalized_dir = public_dir / ".normalized-cache"\n        validated = [\n            (normalize(src, normalized_dir), kind, chapter, caption, treatment, start)\n            for src, kind, chapter, caption, treatment, start in validated\n        ]\n        song_path = normalize(song_path, normalized_dir)\n    shots = []\n    elapsed = 0
     for (src, kind, chapter, caption, treatment, start), frames in zip(validated, durations):
         path = _copy_private(src, public_dir, "story")
         shot = {
@@ -246,10 +248,10 @@ def main() -> None:
     parser.add_argument("--song", type=Path, required=True, help="로컬 최종 MP3/WAV 경로")
     parser.add_argument("--public-dir", type=Path, default=Path("video/public"))
     parser.add_argument("--props", type=Path, default=Path("data/film-props.json"))
-    parser.add_argument("--end-card-seconds", type=float, default=4)
+    parser.add_argument("--end-card-seconds", type=float, default=4)\n    parser.add_argument("--normalize-media", action="store_true",\n                        help="원본을 보존하고 편집용 PNG/MP4/WAV 사본을 생성")
     args = parser.parse_args()
     result = prepare_film(args.approved, args.opening_props, args.song,
-                          args.public_dir, args.props, args.end_card_seconds)
+                          args.public_dir, args.props, args.end_card_seconds, args.normalize_media)
     total = result["opening"]["timing"]["songStartFrame"] + result["songDurationFrames"]
     print(f"완성곡 0초부터 재생 · 본편 {len(result['shots'])}샷 · 전체 {total}프레임 "
           f"({total / FPS:.2f}초) · {args.props}")
