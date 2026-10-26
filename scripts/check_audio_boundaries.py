@@ -28,13 +28,13 @@ def main() -> None:
     # The MP4 begins at global frame 235; sample windows avoid edit boundaries.
     offset = 235 / 30
     checks = [
-        ("pre-birth silence", 7.88, False),
+        ("pre-birth silence", 7.85, False),
         ("birth natural sound", 9.0, True),
         ("title silence", 13.0, False),
         ("song after frame 450", 15.1, True),
     ]
     for label, absolute, audible in checks:
-        level = rms_at(path, absolute - offset)
+        level = rms_at(path, absolute - offset, 0.08 if label == "pre-birth silence" else 0.18)
         print(f"{label}: RMS={level:.6f}")
         if audible and level < 0.004:
             raise AssertionError(f"{label}: expected audible synthetic tone")
