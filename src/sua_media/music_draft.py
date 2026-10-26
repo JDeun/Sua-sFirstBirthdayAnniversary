@@ -46,9 +46,11 @@ def draft_music_edit(approved: Path, song: Path, output: Path, *,
         "story_seconds": story_seconds,
         "note": "Energy-based cut suggestions only; manually verify lyric timing and shots.",
     }
-    output.parent.mkdir(parents=True, exist_ok=True)
     if output.resolve() == approved.resolve():
         raise ValueError("output must differ from original approved shot list")
+    if output.exists():
+        raise FileExistsError(f"draft already exists; review it before replacing: {output}")
+    output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(source, ensure_ascii=False, indent=2), encoding="utf-8")
     return source
 
