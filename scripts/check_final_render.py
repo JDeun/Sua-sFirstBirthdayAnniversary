@@ -44,8 +44,24 @@ def main() -> None:
     parser.add_argument("--expected-frames", type=int, required=True)
     parser.add_argument("--fps", type=int, default=30)
     parser.add_argument("--report", type=Path)
+    parser.add_argument("--black-detect", action="store_true", help="Detect black frames using FFmpeg")
+    parser.add_argument("--max-black-seconds", type=float, default=0.5)
     args = parser.parse_args()
     result = inspect_render(args.video, args.expected_frames, args.fps)
+    if args.black_detect:
+        if args.max_black_seconds < 0:
+            parser.error("--max-black-seconds must be nonnegative")
+        command = ["ffmpeg", "-hide_banner", "-nostdin", "-i", str(args.video),
+                   "-vf", f"blackdetect=d={args.max_black_seconds}:pix_th=0.10:pic_th=0.98",
+                   "-an", "-f", "null", "-"]
+        scan = subprocess.run(command, capture_output=True, text=True, timeout=900)
+        intervals = [line.strip() for line in scan.stderr.splitlines() if "black_start:" in line]
+        result["black_intervals"] = intervals
+        if scan.returncode != 0:
+            result["errors"].append("black-frame scan failed")
+        if intervals:
+            result["errors"].append(f"black intervals detected: {len(intervals)}")
+        result["status"] = "fail" if result["errors"] else "pass"
     output = json.dumps(result, ensure_ascii=False, indent=2)
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
