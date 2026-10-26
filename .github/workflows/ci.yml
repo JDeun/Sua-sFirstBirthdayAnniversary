@@ -83,3 +83,17 @@ jobs:
           python -m sua_media.film --approved /tmp/sua-e2e/approved.json --opening-props /tmp/sua-e2e/opening.json --song /tmp/sua-e2e/song.m4a --public-dir public --props /tmp/sua-e2e/props.json --end-card-seconds 2
           npx remotion render src/index.ts BirthdayFilm out/approved-synthetic-film.mp4 --props=/tmp/sua-e2e/props.json --scale=0.25 --codec=h264 --concurrency=2
           python ../scripts/check_final_render.py out/approved-synthetic-film.mp4 --expected-frames=720
+
+      - name: Single-command synthetic production E2E and QA report
+        run: |
+          mkdir -p /tmp/sua-produce
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i color=c=green:s=640x360 -frames:v 1 /tmp/sua-produce/photo.png
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i sine=frequency=420:sample_rate=48000 -t 7 -c:a aac /tmp/sua-produce/song.m4a
+          cat > /tmp/sua-produce/approved.json <<'EOF'
+          {"shots":[{"source":"photo.png","chapter":"Synthetic QA"}]}
+          EOF
+          cat > /tmp/sua-produce/opening.json <<'EOF'
+          {"imagePaths":[],"timing":{"matchcutEndFrame":240,"birthEndFrame":360,"songStartFrame":450}}
+          EOF
+          python -m sua_media.produce --approved /tmp/sua-produce/approved.json --opening-props /tmp/sua-produce/opening.json --song /tmp/sua-produce/song.m4a --video-dir . --public-dir public --props /tmp/sua-produce/props.json --output /tmp/sua-produce/final.mp4 --report /tmp/sua-produce/qa.json --end-card-seconds 2 --scale 0.25
+          python -c 'import json; p=json.load(open("/tmp/sua-produce/qa.json")); assert p["status"]=="pass", p'
