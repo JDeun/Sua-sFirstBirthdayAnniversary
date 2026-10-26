@@ -28,3 +28,14 @@ class MusicCutsTests(unittest.TestCase):
         for length in (float("nan"), float("inf"), float("-inf")):
             with self.subTest(length=length), self.assertRaises(ValueError):
                 plan_cuts(2, length, [1])
+
+    def test_rejects_invalid_shot_count(self):
+        for count in (0, -1, True, 2.5):
+            with self.subTest(count=count), self.assertRaises(ValueError):
+                plan_cuts(count, 12, [3, 6])
+
+    def test_minimum_shot_duration_configurable(self):
+        self.assertEqual(plan_cuts(3, 12, [2, 4, 8, 10], min_shot_seconds=3),
+                         [0.0, 4.0, 8.0])
+        with self.assertRaises(ValueError):
+            plan_cuts(3, 12, [2, 4, 8, 10], min_shot_seconds=5)
