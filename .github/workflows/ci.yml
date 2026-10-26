@@ -36,3 +36,16 @@ jobs:
 
       - name: Smoke-render transition boundaries as MP4 (synthetic only)
         run: npx remotion render src/index.ts OpeningSequence out/opening-transitions.mp4 --frames=235-465 --scale=0.25 --codec=h264 --concurrency=2
+
+      - name: Generate synthetic birth video and silent story soundtrack
+        run: |
+          mkdir -p public/media/birth
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i testsrc2=size=320x180:rate=30 -f lavfi -i sine=frequency=440:sample_rate=48000 -t 5 -c:v libx264 -pix_fmt yuv420p -c:a aac public/media/birth/ci-birth.mp4
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i sine=frequency=330:sample_rate=48000 -t 9 -c:a aac public/media/birth/ci-song.m4a
+      - name: Render synthetic birth footage and song boundary
+        run: |
+          cat > /tmp/ci-opening-props.json <<'EOF'
+          {"imagePaths":[],"musicPath":"media/birth/ci-song.m4a","birthClip":{"path":"media/birth/ci-birth.mp4","sourceStartFrame":0,"withAudio":true},"timing":{"matchcutEndFrame":240,"birthEndFrame":360,"songStartFrame":450}}
+          EOF
+          npx remotion render src/index.ts OpeningSequence out/birth-integration.mp4 --props=/tmp/ci-opening-props.json --frames=235-465 --scale=0.25 --codec=h264 --concurrency=2
+          ffprobe -v error -show_entries stream=codec_type -of csv=p=0 out/birth-integration.mp4 | grep -q audio
