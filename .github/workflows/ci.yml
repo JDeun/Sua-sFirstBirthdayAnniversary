@@ -51,3 +51,4 @@ jobs:
           EOF
           npx remotion render src/index.ts OpeningSequence out/birth-integration.mp4 --props=/tmp/ci-opening-props.json --frames=235-465 --scale=0.25 --codec=h264 --concurrency=2
           ffprobe -v error -show_entries stream=codec_type -of csv=p=0 out/birth-integration.mp4 | grep -q audio
+          python ../scripts/check_audio_boundaries.py out/birth-integration.mp4
