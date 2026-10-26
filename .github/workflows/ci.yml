@@ -65,3 +65,19 @@ jobs:
           EOF
           npx remotion render src/index.ts BirthdayFilm out/full-synthetic-film.mp4 --props=/tmp/ci-full-film-props.json --scale=0.25 --codec=h264 --concurrency=2
           python ../scripts/check_final_render.py out/full-synthetic-film.mp4 --expected-frames=3150 --black-detect --max-black-seconds=0.5
+
+      - name: Render approved synthetic photo and video through Python film pipeline
+        run: |
+          mkdir -p /tmp/sua-e2e
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i color=c=blue:s=640x360 -frames:v 1 /tmp/sua-e2e/photo.png
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i testsrc2=size=640x360:rate=30 -t 5 -an -c:v libx264 -pix_fmt yuv420p /tmp/sua-e2e/story.mp4
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i sine=frequency=520:sample_rate=48000 -t 9 -c:a aac /tmp/sua-e2e/song.m4a
+          cat > /tmp/sua-e2e/approved.json <<'EOF'
+          {"shots":[{"source":"photo.png","cut_at_seconds":0,"chapter":"First"},{"source":"story.mp4","cut_at_seconds":3,"chapter":"Growth","start_seconds":0}]}
+          EOF
+          cat > /tmp/sua-e2e/opening.json <<'EOF'
+          {"imagePaths":[],"timing":{"matchcutEndFrame":240,"birthEndFrame":360,"songStartFrame":450}}
+          EOF
+          python -m sua_media.film --approved /tmp/sua-e2e/approved.json --opening-props /tmp/sua-e2e/opening.json --song /tmp/sua-e2e/song.m4a --public-dir public --props /tmp/sua-e2e/props.json --end-card-seconds 2
+          npx remotion render src/index.ts BirthdayFilm out/approved-synthetic-film.mp4 --props=/tmp/sua-e2e/props.json --scale=0.25 --codec=h264 --concurrency=2
+          python ../scripts/check_final_render.py out/approved-synthetic-film.mp4 --expected-frames=720
