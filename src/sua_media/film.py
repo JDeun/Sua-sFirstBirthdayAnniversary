@@ -116,6 +116,8 @@ def prepare_film(
     """
     approval = json.loads(approved_path.read_text(encoding="utf-8"))
     opening = json.loads(opening_props_path.read_text(encoding="utf-8"))
+    if isinstance(approval, dict) and isinstance(approval.get("_draft_music_edit"), dict) and approval["_draft_music_edit"].get("status") == "REVIEW_REQUIRED":
+        raise ValueError("음악 자동 컷 초안은 승인 전 렌더링할 수 없습니다: REVIEW_REQUIRED")
     if not isinstance(approval, dict) or not isinstance(approval.get("shots"), list):
         raise ValueError('승인 파일에는 "shots" 배열이 필요합니다.')
     entries = approval["shots"]
