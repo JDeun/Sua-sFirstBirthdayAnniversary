@@ -220,7 +220,7 @@ export const OpeningSequence: React.FC<OpeningSequenceProps> = ({
         <MatchCutMontage imagePaths={imagePaths} totalFrames={matchcutEnd}/>
       </Sequence>
       <Sequence from={matchcutEnd} durationInFrames={birthEnd - matchcutEnd}>
-        {birthClip?.path ? <OffthreadVideo src={staticFile(birthClip.path)} startFrom={birthClip.sourceStartFrame ?? 0} muted={!birthClip.withAudio} style={{width: '100%', height: '100%', objectFit: 'contain', background: '#181818'}}/> : <VerseBegins/>}
+        {birthClip?.path ? <OffthreadVideo src={staticFile(birthClip.path)} startFrom={birthClip.sourceStartFrame ?? 0} muted={!birthClip.withAudio} volume={(frame) => Math.min(1, frame / 8, (birthEnd - matchcutEnd - frame) / 12) * 0.8} style={{width: '100%', height: '100%', objectFit: 'contain', background: '#181818'}}/> : <VerseBegins/>}
       </Sequence>
       <Sequence from={birthEnd} durationInFrames={songStart - birthEnd}>
         <TitleBeat/>
