@@ -34,7 +34,7 @@ def cold_open_markers(title_at: float, song_start: float, birth_at: float = 8.0,
     title_frame = round(title_at * fps)
     song_frame = round(song_start * fps)
     if title_frame < 2 or song_frame >= demo_frames:
-        raise ValueError("현재 18초 미리보기 안에서 설정하세요.")
+        raise ValueError("현재 21초 미리보기 안에서 설정하세요.")
     if song_frame - title_frame < 15:
         raise ValueError("타이틀은 최소 0.5초 이상 표시해야 합니다.")
     return {"matchcutEndFrame": birth_frame, "birthEndFrame": title_frame, "songStartFrame": song_frame}
@@ -79,7 +79,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="무음/효과음 콜드 오픈과 Suno 완성곡 시작 시점을 편집")
     parser.add_argument("--props", type=Path, default=Path("data/opening-props.json"))
     parser.add_argument("--title-at", type=float, default=12.0,
-                        help="매치컷 종료·타이틀 등장 시점(초)")
+                        help="탄생 영상 종료·타이틀 등장 시점(초)")
     parser.add_argument("--song-start", type=float, default=15.0,
                         help="Suno 완성곡의 0:00 재생 시작 시점(초)")
     parser.add_argument("--music", default=None,
