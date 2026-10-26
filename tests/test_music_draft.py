@@ -31,3 +31,18 @@ class MusicDraftTests(unittest.TestCase):
             approved.write_text('{"shots":[{"source":"a.jpg","cut_at_seconds":0}]}')
             with self.assertRaises(ValueError):
                 draft_music_edit(approved, Path(temp) / "song.mp3", Path(temp) / "out.json")
+
+    def test_existing_draft_is_not_overwritten(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            approved = base / "approved.json"
+            output = base / "draft.json"
+            approved.write_text('{"shots":[{"source":"a.jpg"}]}')
+            output.write_text("reviewed by family")
+            with patch("sua_media.music_draft.probe_duration_seconds", return_value=12), \\
+                 patch("sua_media.music_draft.analyze_audio", return_value={
+                     "seconds": [], "analysis": "positive_log_rms_novelty"
+                 }):
+                with self.assertRaises(FileExistsError):
+                    draft_music_edit(approved, base / "song.mp3", output)
+            self.assertEqual(output.read_text(), "reviewed by family")
