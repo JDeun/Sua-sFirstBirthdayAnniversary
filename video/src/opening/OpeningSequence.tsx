@@ -31,7 +31,7 @@ const DEMO_COUNT = 48;
 
 /** 인공 그래픽 데모. 실제 아이 얼굴을 생성하거나 모사하지 않습니다. */
 const DemoAlignedPortrait: React.FC<{index: number}> = ({index}) => {
-  const month = Math.min(11, Math.floor(index / 4));
+  const month = Math.max(0, 11 - Math.floor(index / 4));
   const accent = demoPalettes[month % demoPalettes.length];
   const hairColor = ['#7B675D', '#695346', '#55473D'][month % 3];
   return (
@@ -189,8 +189,8 @@ const VerseBegins: React.FC = () => {
 
 /**
  * 콜드 오픈: 매치컷에는 배경음악을 넣지 않습니다.
- * 0~9s 사진과 선택적 전환 효과음 → 9~12s 타이틀 + 선택적 임팩트 효과음
- * → 12s부터 Suno 완성곡의 처음(0:00)을 재생합니다.
+ * 0~8s 현재→출생 역순 사진 → 8~12s 탄생 영상(선택적 현장음)
+ * → 12~15s 타이틀 → 15s부터 완성곡의 처음(0:00)을 재생합니다.
  * 실제 시점은 props.timing으로 조정 가능; 음악 파일 자체를 잘라 시작하지 않습니다.
  */
 export const OpeningSequence: React.FC<OpeningSequenceProps> = ({
