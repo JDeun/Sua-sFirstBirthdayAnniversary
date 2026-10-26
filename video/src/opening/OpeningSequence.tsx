@@ -3,6 +3,7 @@ import {
   AbsoluteFill,
   Audio,
   Img,
+  OffthreadVideo,
   interpolate,
   Sequence,
   staticFile,
@@ -21,7 +22,8 @@ export type OpeningSequenceProps = {
   imagePaths: string[];
   musicPath: string;
   soundEffects?: {montagePath?: string; titleImpactPath?: string};
-  timing?: {matchcutEndFrame: number; songStartFrame?: number; verseStartFrame?: number};
+  timing?: {matchcutEndFrame: number; birthEndFrame?: number; songStartFrame?: number; verseStartFrame?: number};
+  birthClip?: {path: string; sourceStartFrame?: number; withAudio?: boolean};
 };
 
 const demoPalettes = ['#E8C6B2', '#D7B399', '#CFAC92', '#D9BDA4', '#E2BDA8'];
@@ -196,15 +198,18 @@ export const OpeningSequence: React.FC<OpeningSequenceProps> = ({
   musicPath,
   soundEffects,
   timing,
+  birthClip,
 }) => {
   const matchcutEnd = timing?.matchcutEndFrame ?? MATCHCUT_END_FRAME;
   // 이전 버전 props의 verseStartFrame도 안전하게 읽되, 신규 키는 songStartFrame입니다.
   const songStart = timing?.songStartFrame ?? timing?.verseStartFrame ?? SONG_START_FRAME;
+  const birthEnd = timing?.birthEndFrame ?? matchcutEnd + 4 * 30;
   if (
+    !Number.isInteger(birthEnd) || birthEnd <= matchcutEnd || birthEnd >= songStart ||
     !Number.isInteger(matchcutEnd) ||
     !Number.isInteger(songStart) ||
     matchcutEnd < 2 ||
-    songStart - matchcutEnd < 15 ||
+    songStart - birthEnd < 15 ||
     songStart >= OPENING_DURATION_FRAMES
   ) {
     throw new Error('콜드 오픈 마커가 잘못되었습니다. 타이틀과 노래 시작 시점을 확인하세요.');
@@ -214,7 +219,10 @@ export const OpeningSequence: React.FC<OpeningSequenceProps> = ({
       <Sequence from={0} durationInFrames={matchcutEnd}>
         <MatchCutMontage imagePaths={imagePaths} totalFrames={matchcutEnd}/>
       </Sequence>
-      <Sequence from={matchcutEnd} durationInFrames={songStart - matchcutEnd}>
+      <Sequence from={matchcutEnd} durationInFrames={birthEnd - matchcutEnd}>
+        {birthClip?.path ? <OffthreadVideo src={staticFile(birthClip.path)} startFrom={birthClip.sourceStartFrame ?? 0} muted={!birthClip.withAudio} style={{width: '100%', height: '100%', objectFit: 'contain', background: '#181818'}}/> : <VerseBegins/>}
+      </Sequence>
+      <Sequence from={birthEnd} durationInFrames={songStart - birthEnd}>
         <TitleBeat/>
       </Sequence>
       <Sequence from={songStart} durationInFrames={OPENING_DURATION_FRAMES - songStart}>
@@ -227,7 +235,7 @@ export const OpeningSequence: React.FC<OpeningSequenceProps> = ({
         </Sequence>
       ) : null}
       {soundEffects?.titleImpactPath ? (
-        <Sequence from={matchcutEnd} durationInFrames={songStart - matchcutEnd} layout="none">
+        <Sequence from={birthEnd} durationInFrames={songStart - birthEnd} layout="none">
           <Audio src={staticFile(soundEffects.titleImpactPath)} volume={0.5}/>
         </Sequence>
       ) : null}
