@@ -13,7 +13,8 @@ from pathlib import Path
 
 def plan_cuts(shot_count: int, story_seconds: float, landmarks: list[float],
               min_shot_seconds: float = 1.0) -> list[float]:
-    if (shot_count < 1 or not math.isfinite(story_seconds) or
+    if (not isinstance(shot_count, int) or isinstance(shot_count, bool) or
+            shot_count < 1 or not math.isfinite(story_seconds) or
             not math.isfinite(min_shot_seconds) or story_seconds <= 0 or min_shot_seconds <= 0):
         raise ValueError("Invalid story length or shot count")
     if shot_count * min_shot_seconds > story_seconds + 1e-9:
