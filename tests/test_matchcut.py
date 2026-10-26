@@ -21,14 +21,26 @@ class MatchCutTests(unittest.TestCase):
                 ]
             }), encoding="utf-8")
             selection = root / "approved.json"
-            selection.write_text(json.dumps({"approved_outputs": ["a.png", "b.png"]}), encoding="utf-8")
+            selection.write_text(json.dumps({"approved_outputs": ["b.png", "a.png"]}), encoding="utf-8")
             props = prepare_matchcut(aligned / "report.json", selection,
                                      root / "video/public/media/matchcut",
                                      root / "data/props.json")
             self.assertEqual(props["imagePaths"],
-                             ["media/matchcut/a.png", "media/matchcut/b.png"])
+                             ["media/matchcut/b.png", "media/matchcut/a.png"])
             self.assertEqual((aligned / "a.png").read_bytes(), b"older")
             self.assertEqual((root / "video/public/media/matchcut/b.png").read_bytes(), b"newer")
+
+    def test_reject_chronological_order(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in ('old.png', 'new.png'):
+                (root / name).write_bytes(name.encode())
+            (root / 'report.json').write_text(json.dumps({'items': [
+                {'output': 'old.png', 'status': 'aligned', 'captured_at': '2025-12-19'},
+                {'output': 'new.png', 'status': 'aligned', 'captured_at': '2026-10-01'}]}))
+            (root / 'approved.json').write_text(json.dumps({'approved_outputs': ['old.png', 'new.png']}))
+            with self.assertRaisesRegex(ValueError, '내림차순'):
+                prepare_matchcut(root / 'report.json', root / 'approved.json', root / 'public', root / 'props.json')
 
     def test_reject_traversal_and_missing(self):
         with tempfile.TemporaryDirectory() as tmp:
