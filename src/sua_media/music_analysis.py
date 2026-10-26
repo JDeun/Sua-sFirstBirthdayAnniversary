@@ -9,6 +9,8 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import subprocess
+import tempfile
 import wave
 from pathlib import Path
 
@@ -66,15 +68,34 @@ def propose_landmarks(path: Path, *, hop_seconds: float = 0.1,
     }
 
 
+def analyze_audio(path: Path, **kwargs) -> dict:
+    """Accept common music formats by decoding locally through FFmpeg."""
+    if path.suffix.lower() == ".wav":
+        try:
+            return propose_landmarks(path, **kwargs)
+        except (ValueError, wave.Error):
+            pass  # WAV may use float PCM or other unsupported encodings.
+    with tempfile.TemporaryDirectory(prefix="sua-audio-") as temp:
+        decoded = Path(temp) / "analysis.wav"
+        try:
+            subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin",
+                            "-i", str(path), "-vn", "-ac", "1", "-ar", "16000",
+                            "-c:a", "pcm_s16le", str(decoded)],
+                           check=True, capture_output=True, timeout=300)
+        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+            raise ValueError(f"Could not decode audio locally: {path.name}") from exc
+        return propose_landmarks(decoded, **kwargs)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Propose local WAV audio cut landmarks")
-    parser.add_argument("wav", type=Path)
+    parser.add_argument("audio", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--hop-seconds", type=float, default=0.1)
     parser.add_argument("--min-gap-seconds", type=float, default=1.5)
     parser.add_argument("--sensitivity", type=float, default=1.6)
     args = parser.parse_args()
-    result = propose_landmarks(args.wav, hop_seconds=args.hop_seconds,
+    result = analyze_audio(args.audio, hop_seconds=args.hop_seconds,
                                min_gap_seconds=args.min_gap_seconds,
                                sensitivity=args.sensitivity)
     args.output.parent.mkdir(parents=True, exist_ok=True)
