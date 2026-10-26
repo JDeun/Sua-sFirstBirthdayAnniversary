@@ -7,17 +7,19 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 
 
 def plan_cuts(shot_count: int, story_seconds: float, landmarks: list[float],
               min_shot_seconds: float = 1.0) -> list[float]:
-    if shot_count < 1 or story_seconds <= 0 or min_shot_seconds <= 0:
+    if (shot_count < 1 or not math.isfinite(story_seconds) or
+            not math.isfinite(min_shot_seconds) or story_seconds <= 0 or min_shot_seconds <= 0):
         raise ValueError("Invalid story length or shot count")
     if shot_count * min_shot_seconds > story_seconds + 1e-9:
         raise ValueError("Too many shots for the available story duration")
     if any(not isinstance(t, (int, float)) or isinstance(t, bool) or
-           not 0 < t < story_seconds for t in landmarks):
+           not math.isfinite(t) or not 0 < t < story_seconds for t in landmarks):
         raise ValueError("Landmarks must lie strictly inside the story duration")
     candidates = sorted(set(float(t) for t in landmarks))
     # Dynamic programming avoids greedy early choices that leave no room later.
