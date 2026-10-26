@@ -27,6 +27,10 @@ def draft_music_edit(approved: Path, song: Path, output: Path, *,
         raise ValueError("approved file must contain nonempty shot objects")
     if any("cut_at_seconds" in shot for shot in shots):
         raise ValueError("existing manual cut positions must not be overwritten")
+    if output.resolve() == approved.resolve():
+        raise ValueError("output must differ from original approved shot list")
+    if output.exists():
+        raise FileExistsError(f"draft already exists; review it before replacing: {output}")
     duration = probe_duration_seconds(song)
     # Same 30fps rounding convention as film.prepare_film.
     song_frames = math.ceil(duration * 30)
@@ -46,10 +50,6 @@ def draft_music_edit(approved: Path, song: Path, output: Path, *,
         "story_seconds": story_seconds,
         "note": "Energy-based cut suggestions only; manually verify lyric timing and shots.",
     }
-    if output.resolve() == approved.resolve():
-        raise ValueError("output must differ from original approved shot list")
-    if output.exists():
-        raise FileExistsError(f"draft already exists; review it before replacing: {output}")
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(source, ensure_ascii=False, indent=2), encoding="utf-8")
     return source
