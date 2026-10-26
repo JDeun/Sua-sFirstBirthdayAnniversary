@@ -13,6 +13,8 @@ jobs:
           python-version: "3.11"
       - name: Install package
         run: python -m pip install -e .
+      - name: Install FFmpeg for QA tests
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
       - name: Unit tests (synthetic files only)
         run: python -m unittest discover -s tests -v
   video:
@@ -59,4 +61,4 @@ jobs:
           {"opening":{"imagePaths":[],"musicPath":"media/birth/ci-song.m4a","timing":{"matchcutEndFrame":240,"birthEndFrame":360,"songStartFrame":450}},"songDurationFrames":2700,"endCardFrames":120,"shots":[]}
           EOF
           npx remotion render src/index.ts BirthdayFilm out/full-synthetic-film.mp4 --props=/tmp/ci-full-film-props.json --scale=0.25 --codec=h264 --concurrency=2
-          python ../scripts/check_final_render.py out/full-synthetic-film.mp4 --expected-frames=3150
+          python ../scripts/check_final_render.py out/full-synthetic-film.mp4 --expected-frames=3150 --black-detect --max-black-seconds=0.5
