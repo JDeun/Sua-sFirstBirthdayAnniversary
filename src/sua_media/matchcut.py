@@ -23,6 +23,10 @@ def prepare_matchcut(report_path: Path, approved_path: Path, media_dir: Path,
         item["output"]: item for item in report["items"]
         if item.get("status") == "aligned" and item.get("output")
     }
+    dates = [indexed[name].get('captured_at') for name in names if name in indexed]
+    if len(dates) == len(names) and all(isinstance(d, str) and d for d in dates):
+        if dates != sorted(dates, reverse=True):
+            raise ValueError('역순 매치컷은 최근 → 출생 촬영일 내림차순으로 승인해야 합니다.')
     candidates: list[Path] = []
     for name in names:
         if Path(name).name != name or name not in indexed:
@@ -47,7 +51,7 @@ def prepare_matchcut(report_path: Path, approved_path: Path, media_dir: Path,
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="승인한 얼굴 정렬 사진만 로컬 프리뷰에 반영")
+    parser = argparse.ArgumentParser(description="최근 → 출생 역순으로 승인한 얼굴 정렬 사진을 로컬 프리뷰에 반영")
     parser.add_argument("--report", type=Path, default=Path("output/faces/report.json"))
     parser.add_argument("--approved", type=Path, default=Path("data/approved-matchcut.json"))
     parser.add_argument("--public-dir", type=Path, default=Path("video/public/media/matchcut"))
