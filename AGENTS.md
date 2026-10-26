@@ -6,10 +6,10 @@ Google Drive에서 모은 사진·영상으로 **전문 업체 수준의 성장�
 
 ## 이번에 확정된 연출 방향
 
-- **첫 장면은 음악 없는 초고속 Face-aligned Match Cut**입니다. 출생부터 첫돌까지 정면/유사 구도의 사진 수십 장을 기하학적으로 정렬하고 시간순으로 짧게 교체합니다.
+- **첫 장면은 음악 없는 초고속 Face-aligned Match Cut**입니다. 현재부터 출생까지 역순으로 정렬한 정면/유사 구도의 사진 수십 장을 기하학적으로 정렬하고 시간순으로 짧게 교체합니다.
 - 컷 속도가 서서히 빨라지는 시각적 긴장감을 줍니다. Suno 곡을 오프닝에 깔지 않습니다. 효과음은 선택 사항입니다.
-- 빠른 성장 몽타주 이후 별도 임팩트 효과음이나 무음으로 짧은 **타이틀 카드**로 전환합니다.
-- **타이틀 다음에 완성된 Suno 곡의 첫 샘플(0:00)을 재생**하고 본편이 시작됩니다. 곡의 내부 벌스가 12초에 시작한다는 의미가 아닙니다. 9초 매치컷 / 3초 타이틀 / 12초 곡 재생은 임시 시점입니다.
+- 빠른 역순 몽타주 이후 **탄생 당시 실제 동영상(현장음 선택)**과 짧은 **타이틀 카드**로 전환합니다.
+- **타이틀 다음에 완성된 Suno 곡의 첫 샘플(0:00)을 재생**하고 본편이 시작됩니다. 곡의 내부 벌스가 12초에 시작한다는 의미가 아닙니다. 8초 매치컷 / 4초 탄생 영상 / 3초 타이틀 / 15초 곡 재생이 기본 시점입니다.
 - 음악은 사용자가 Suno **웹의 Custom 모드**로 별도 완성합니다. 곡에 영상용 라이저/프리코러스/타이틀 악센트를 강제로 넣지 않습니다. 오디오 샘플이나 음악을 저장소에 올리지 않습니다.
 - 최종 4분 스토리보드는 [docs/TEMPLATE_SPEC.md](docs/TEMPLATE_SPEC.md) 기준으로 갱신합니다.
 
@@ -42,10 +42,10 @@ Google Drive에서 모은 사진·영상으로 **전문 업체 수준의 성장�
 1. 로컬로 내려받은 Google Drive 폴더 분석: `sua-media 경로 --out data/manifest.json`
 2. 정확한 출생일·월령별 자료와 중요 사진을 검토
 3. YuNet으로 얼굴 정렬 후 실패/다인물 사진 제외 또는 수동 보정
-4. `data/approved-matchcut.json`에 **출생부터 현재 순서로** 승인 사진 나열
+4. `data/approved-matchcut.json`에 **현재부터 출생 순서로** 승인 사진 나열
 5. `sua-matchcut`으로 로컬 이미지 및 `data/opening-props.json` 작성
 6. `cd video && npm run dev`로 `OpeningSequence` 미리보기
-7. `sua-cold-open --title-at 9 --song-start 12 --music media/music/suno-final.wav`로 음악이 **타이틀 뒤에 0초부터 재생**되도록 설정합니다. 별도의 `sua-audio-cues` 분석은 후속 곡 전체 편집에서만 선택적으로 사용합니다.
+7. `sua-cold-open --birth-at 8 --birth-video media/birth/clip.mp4 --title-at 12 --song-start 15 --music media/music/suno-final.wav`로 음악이 **타이틀 뒤에 0초부터 재생**되도록 설정합니다. 별도의 `sua-audio-cues` 분석은 후속 곡 전체 편집에서만 선택적으로 사용합니다.
 8. 전체 4분짜리 성장영상의 편집기·스토리보드와 연동
 9. `python -m unittest discover -s tests -v`, `cd video && npm run typecheck`, Remotion 번들 검사 실행
 
