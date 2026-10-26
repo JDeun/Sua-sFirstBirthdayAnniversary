@@ -188,7 +188,27 @@ def prepare_film(
         if kind == "video" and start + frames / FPS > probe_duration_seconds(src) + 0.033:
             raise ValueError(f"샷 {i}: 동영상 길이가 할당된 {frames / FPS:.1f}초보다 짧습니다. weight를 줄이거나 다른 샷을 추가하세요.")
 
+    # The opening birth clip is not part of the story shot allocation. Validate
+    # its locally staged file before producing the final props file.
     public_dir = public_dir.resolve()
+    birth_clip = opening.get("birthClip")
+    if birth_clip is not None:
+        if not isinstance(birth_clip, dict):
+            raise ValueError("탄생 영상 설정은 객체여야 합니다.")
+        relative = birth_clip.get("path")
+        offset = birth_clip.get("sourceStartFrame", 0)
+        if (not isinstance(relative, str) or not relative.startswith("media/") or
+                "\\\\" in relative or any(part in (".", "..") for part in Path(relative).parts) or
+                Path(relative).suffix.lower() not in VIDEO_SUFFIXES):
+            raise ValueError("탄생 영상 경로는 public/media 내부의 동영상이어야 합니다.")
+        if isinstance(offset, bool) or not isinstance(offset, int) or offset < 0:
+            raise ValueError("탄생 영상 시작 프레임은 0 이상의 정수여야 합니다.")
+        candidate = (public_dir / relative).resolve()
+        if not candidate.is_relative_to((public_dir / "media").resolve()) or not candidate.is_file():
+            raise ValueError("탄생 영상 파일이 로컬 public/media에 없습니다.")
+        required = (birth_end - matchcut_end) / FPS
+        if offset / FPS + required > probe_duration_seconds(candidate) + 0.033:
+            raise ValueError("탄생 영상 길이가 할당된 구간보다 짧습니다.")
     shots = []
     elapsed = 0
     for (src, kind, chapter, caption, treatment, start), frames in zip(validated, durations):
