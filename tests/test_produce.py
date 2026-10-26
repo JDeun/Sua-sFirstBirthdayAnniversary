@@ -79,6 +79,34 @@ class ProduceTests(unittest.TestCase):
                 prepare.assert_not_called()
             self.assertEqual(approved.read_text(), "important approved edits")
 
+    def test_qa_failure_removes_unverified_video_and_keeps_diagnostic_report(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            video = root / "video"
+            (video / "src").mkdir(parents=True)
+            (video / "src" / "index.ts").write_text("")
+            (video / "public").mkdir()
+            output, report = root / "film.mp4", root / "qa.json"
+
+            def fake_run(command, **kwargs):
+                if "remotion" in command:
+                    output.write_bytes(b"unverified")
+                else:
+                    report.write_text(json.dumps({"status": "fail", "errors": ["bad duration"]}))
+
+            with patch("sua_media.produce.prepare_film", return_value={
+                "opening": {"timing": {"songStartFrame": 450}},
+                "songDurationFrames": 300,
+            }), patch("sua_media.produce.subprocess.run", side_effect=fake_run):
+                with self.assertRaisesRegex(RuntimeError, "Final QA did not pass"):
+                    produce(approved=root / "approved.json",
+                            opening_props=root / "opening.json",
+                            song=root / "song.mp3", public_dir=video / "public",
+                            props=root / "props.json", output=output,
+                            report=report, video_dir=video)
+            self.assertFalse(output.exists())
+            self.assertEqual(json.loads(report.read_text())["status"], "fail")
+
     def test_failed_render_cleans_partial_output(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
