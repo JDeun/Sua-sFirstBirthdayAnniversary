@@ -58,5 +58,5 @@ jobs:
           cat > /tmp/ci-full-film-props.json <<'EOF'
           {"opening":{"imagePaths":[],"musicPath":"media/birth/ci-song.m4a","timing":{"matchcutEndFrame":240,"birthEndFrame":360,"songStartFrame":450}},"songDurationFrames":2700,"endCardFrames":120,"shots":[]}
           EOF
-          npx remotion render src/index.ts BirthdayFilm out/full-synthetic-film.mp4 --props=/tmp/ci-full-film-props.json --scale=0.125 --codec=h264 --concurrency=2
+          npx remotion render src/index.ts BirthdayFilm out/full-synthetic-film.mp4 --props=/tmp/ci-full-film-props.json --scale=0.25 --codec=h264 --concurrency=2
           python ../scripts/check_final_render.py out/full-synthetic-film.mp4 --expected-frames=3150
