@@ -37,7 +37,9 @@ jobs:
       - name: Smoke-render transition boundaries as MP4 (synthetic only)
         run: npx remotion render src/index.ts OpeningSequence out/opening-transitions.mp4 --frames=235-465 --scale=0.25 --codec=h264 --concurrency=2
 
-      - name: Generate synthetic birth video and silent story soundtrack
+      - name: Install FFmpeg for synthetic integration fixtures
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - name: Generate synthetic birth video and story soundtrack
         run: |
           mkdir -p public/media/birth
           ffmpeg -hide_banner -loglevel error -y -f lavfi -i testsrc2=size=320x180:rate=30 -f lavfi -i sine=frequency=440:sample_rate=48000 -t 5 -c:v libx264 -pix_fmt yuv420p -c:a aac public/media/birth/ci-birth.mp4
