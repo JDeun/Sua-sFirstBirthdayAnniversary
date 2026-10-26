@@ -212,7 +212,17 @@ def prepare_film(
         required = (birth_end - matchcut_end) / FPS
         if offset / FPS + required > probe_duration_seconds(candidate) + 0.033:
             raise ValueError("탄생 영상 길이가 할당된 구간보다 짧습니다.")
-    # All input validation precedes private asset conversion. The normalized\n    # files are local derivatives; source originals are never modified.\n    if normalize_media:\n        normalized_dir = public_dir / "media" / ".normalized-cache"\n        validated = [\n            (normalize(src, normalized_dir), kind, chapter, caption, treatment, start)\n            for src, kind, chapter, caption, treatment, start in validated\n        ]\n        song_path = normalize(song_path, normalized_dir)\n    shots = []\n    elapsed = 0
+    # All input validation precedes private asset conversion. The normalized
+    # files are local derivatives; source originals are never modified.
+    if normalize_media:
+        normalized_dir = public_dir / "media" / ".normalized-cache"
+        validated = [
+            (normalize(src, normalized_dir), kind, chapter, caption, treatment, start)
+            for src, kind, chapter, caption, treatment, start in validated
+        ]
+        song_path = normalize(song_path, normalized_dir)
+    shots = []
+    elapsed = 0
     for (src, kind, chapter, caption, treatment, start), frames in zip(validated, durations):
         path = _copy_private(src, public_dir, "story")
         shot = {
