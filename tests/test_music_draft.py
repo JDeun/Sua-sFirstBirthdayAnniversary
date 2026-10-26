@@ -39,7 +39,7 @@ class MusicDraftTests(unittest.TestCase):
             output = base / "draft.json"
             approved.write_text('{"shots":[{"source":"a.jpg"}]}')
             output.write_text("reviewed by family")
-            with patch("sua_media.music_draft.probe_duration_seconds", return_value=12), \\
+            with patch("sua_media.music_draft.probe_duration_seconds", return_value=12), \
                  patch("sua_media.music_draft.analyze_audio", return_value={
                      "seconds": [], "analysis": "positive_log_rms_novelty"
                  }):
