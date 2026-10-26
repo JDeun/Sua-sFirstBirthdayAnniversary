@@ -61,6 +61,24 @@ class ProduceTests(unittest.TestCase):
                 prepare.assert_not_called()
             self.assertEqual(output.read_bytes(), b"important existing film")
 
+    def test_rejects_source_output_collision(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            video = root / "video"
+            (video / "src").mkdir(parents=True)
+            (video / "src" / "index.ts").write_text("")
+            (video / "public").mkdir()
+            approved = root / "approved.json"
+            approved.write_text("important approved edits")
+            with patch("sua_media.produce.prepare_film") as prepare:
+                with self.assertRaisesRegex(ValueError, "source inputs"):
+                    produce(approved=approved, opening_props=root / "opening.json",
+                            song=root / "song.mp3", public_dir=video / "public",
+                            props=approved, output=root / "film.mp4",
+                            report=root / "qa.json", video_dir=video)
+                prepare.assert_not_called()
+            self.assertEqual(approved.read_text(), "important approved edits")
+
     def test_failed_render_cleans_partial_output(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
