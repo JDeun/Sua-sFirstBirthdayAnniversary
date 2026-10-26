@@ -30,6 +30,9 @@ jobs:
       - name: Validate Remotion composition bundling
         run: npx remotion compositions src/index.ts
       - name: Smoke-render synthetic opening frame
-        run: npx remotion still src/index.ts OpeningSequence out/opening-smoke.png --frame=280 --scale=0.25
+        run: npx remotion still src/index.ts OpeningSequence out/opening-smoke.png --frame=239 --scale=0.25
       - name: Smoke-render synthetic full-film frame
-        run: npx remotion still src/index.ts BirthdayFilm out/film-smoke.png --frame=400 --scale=0.25
+        run: npx remotion still src/index.ts BirthdayFilm out/film-smoke.png --frame=450 --scale=0.25
+
+      - name: Smoke-render transition boundaries as MP4 (synthetic only)
+        run: npx remotion render src/index.ts OpeningSequence out/opening-transitions.mp4 --frames=235-465 --scale=0.25 --codec=h264 --concurrency=2
