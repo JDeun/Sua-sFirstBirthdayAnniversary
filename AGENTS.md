@@ -79,3 +79,24 @@ Google Drive에서 모은 사진·영상으로 **전문 업체 수준의 성장�
 - 외부 모션 스킬은 연출 참고자료로만 사용하고, 실제 편집은 Remotion의 프레임 기반 타임라인으로 구성합니다.
 
 현재 전체 컴포지션은 기본 골격이며, **선택된 개인 미디어가 연결되고 가사별 컷이 검수되기 전까지 완성 영상이라고 부르지 않습니다.**
+
+## 통합 제작 명령 (로컬 에이전트)
+
+가족이 검토한 `data/approved-story.json`, `data/opening-props.json`, 최종 음원 파일이 준비된 뒤 저장소 루트에서 실행합니다.
+
+~~~bash
+python -m pip install -e .
+cd video && npm install && cd ..
+sua-produce --approved data/approved-story.json \\
+  --opening-props data/opening-props.json \\
+  --song "/개인/음악/최종곡.mp3" \\
+  --video-dir video --public-dir video/public \\
+  --props data/film-props.json \\
+  --output video/out/sua-first-birthday.mp4 \\
+  --report data/final-qa.json --normalize-media
+~~~
+
+- `sua-produce`는 렌더링·QA를 연속 실행하고 QA JSON을 저장합니다. 동일한 출력 파일이 있으면 **덮어쓰지 않고 실패**합니다. 재실행 전 파일을 백업하거나 다른 경로를 지정하세요.
+- 빠른 사전 검증에는 `--scale 0.25`를 사용할 수 있으나 최종 납품 영상은 기본값인 1.0으로 렌더링합니다.
+- `sua-music-draft`의 자동 생성 컷은 검토 대상이며 가족의 승인 없이 확정본으로 간주하지 않습니다.
+- 자동 QA 통과는 스토리텔링·얼굴 잘림·가사 싱크에 대한 **사람의 시청 검수**를 대신하지 않습니다.
