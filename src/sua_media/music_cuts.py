@@ -52,6 +52,7 @@ def main() -> None:
     parser.add_argument("--landmarks", type=Path, required=True)
     parser.add_argument("--story-seconds", type=float, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--min-shot-seconds", type=float, default=1.0)
     args = parser.parse_args()
     approved = json.loads(args.approved.read_text(encoding="utf-8"))
     landmarks = json.loads(args.landmarks.read_text(encoding="utf-8"))
@@ -59,7 +60,8 @@ def main() -> None:
         raise ValueError("approved file needs nonempty shots")
     if not isinstance(landmarks.get("seconds"), list):
         raise ValueError("landmarks file needs seconds array")
-    cuts = plan_cuts(len(approved["shots"]), args.story_seconds, landmarks["seconds"])
+    cuts = plan_cuts(len(approved["shots"]), args.story_seconds, landmarks["seconds"],
+                     min_shot_seconds=args.min_shot_seconds)
     for shot, cut in zip(approved["shots"], cuts):
         shot["cut_at_seconds"] = cut
     args.output.parent.mkdir(parents=True, exist_ok=True)
