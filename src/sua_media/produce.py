@@ -23,12 +23,16 @@ def produce(*, approved: Path, opening_props: Path, song: Path, public_dir: Path
         raise ValueError("public_dir must be the Remotion project's public directory")
     output = output.resolve()
     report = report.resolve()
-    if output == report or output == props.resolve():
+    if len({output, report, props.resolve()}) != 3:
         raise ValueError("output, report, and props paths must differ")
+    if props.resolve() in {approved.resolve(), opening_props.resolve(), song.resolve()} or report in {approved.resolve(), opening_props.resolve(), song.resolve()} or output in {approved.resolve(), opening_props.resolve(), song.resolve()}:
+        raise ValueError("production outputs must not overwrite source inputs")
     if output.exists():
         raise FileExistsError(f"Refusing to overwrite existing render: {output}")
     if report.exists():
         raise FileExistsError(f"Refusing to overwrite existing QA report: {report}")
+    if props.exists():
+        raise FileExistsError(f"Refusing to overwrite existing film props: {props}")
     if output.suffix.lower() != ".mp4":
         raise ValueError("output must be an .mp4 file")
     data = prepare_film(approved, opening_props, song, public_dir, props,
