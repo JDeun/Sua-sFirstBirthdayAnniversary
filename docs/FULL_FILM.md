@@ -67,6 +67,22 @@ npx remotion render src/index.ts BirthdayFilm out/sua-first-birthday.mp4 \
 
 이 자료는 개인 경로·날짜·가족 정보가 들어갈 수 있으므로 **`data/` 아래에서만 관리**하고 외부에 공유하지 않습니다.
 
+## 자동 음악 컷 초안의 명시적 승인
+
+`sua-music-draft` 결과에는 `_draft_music_edit.status=REVIEW_REQUIRED`가 들어 있으며, 이 상태로는 `sua-film` 또는 `sua-produce` 렌더링을 진행할 수 없습니다. **Codex·Claude Code는 사용자에게 개별 컷과 사진 선택을 보여주고 명시적으로 승인받기 전에는 승인 명령을 실행해서는 안 됩니다.**
+
+사용자가 실제로 편집 초안을 검토하고 승인한 뒤에만 로컬 터미널에서 실행합니다.
+
+~~~bash
+sua-approve --draft data/music-draft.json \\
+  --output data/approved-story.json --confirm APPROVE
+sua-produce --approved data/approved-story.json \\
+  --opening-props data/opening-props.json \\
+  --song "/개인/음악/네가 빛날 우주 (2).mp3"
+~~~
+
+원본 초안은 보존되며, 승인본을 덮어쓰지 않습니다. 승인 기록은 **로컬 명령을 통한 확인 시각**만 기록하며 승인자 신원 인증이나 서명은 제공하지 않습니다. 최종 QA가 실패하면 불완전한 MP4는 제거하고 오류 보고서는 진단을 위해 보존합니다. 보고서 확인 후 새 출력 경로를 지정해 다시 제작하세요.
+
 ## 최종 품질 검수
 
 - 첫 8초는 음악이 없고, 8~12초에는 선택된 탄생 영상 현장음만, 12~15초에는 무음 타이틀, **15초부터 완성곡의 0초**가 재생되어야 합니다.
