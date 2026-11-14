@@ -1,0 +1,7 @@
+{
+  "runtime_directory": "runtime",
+  "asset_directory": "assets",
+  "media_directory": "sources",
+  "output_directory": "output",
+  "staging_mode": "copy"
+}

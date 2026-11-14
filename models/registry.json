@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "models": [
+    {
+      "id": "yunet-2023mar",
+      "purpose": "Five-landmark face/eye alignment; geometric transform only.",
+      "filename": "yunet/face_detection_yunet_2023mar.onnx",
+      "sha256": "8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4",
+      "size_bytes": 232589,
+      "bundled": true,
+      "license": "MIT",
+      "source": "https://github.com/opencv/opencv_zoo/tree/48b10fa505aeb51fbd127fc60a5c660040e823b7/models/face_detection_yunet",
+      "download_url": "https://media.githubusercontent.com/media/opencv/opencv_zoo/48b10fa505aeb51fbd127fc60a5c660040e823b7/models/face_detection_yunet/face_detection_yunet_2023mar.onnx"
+    },
+    {
+      "id": "whisper-small",
+      "purpose": "Optional local known-lyric alignment; listening review remains necessary.",
+      "filename": "whisper/small.pt",
+      "sha256": "9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794",
+      "size_bytes": 483617219,
+      "bundled": false,
+      "license": "MIT",
+      "source": "https://github.com/openai/whisper",
+      "download_url": "https://openaipublic.azureedge.net/main/whisper/models/9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794/small.pt"
+    }
+  ]
+}

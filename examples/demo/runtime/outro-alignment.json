@@ -1,0 +1,28 @@
+{
+  "fps": 30,
+  "status": "synthetic_demo",
+  "review_status": "synthetic",
+  "lines": [
+    {
+      "id": "closing",
+      "text": "Final chapter",
+      "start_frame": 90,
+      "end_frame": 120,
+      "start_seconds": 3.0,
+      "end_seconds": 4.0,
+      "words": [
+        {
+          "text": "Final chapter",
+          "start_frame": 90,
+          "end_frame": 120,
+          "start_seconds": 3.0,
+          "end_seconds": 4.0,
+          "char_start": 0,
+          "char_end": 12
+        }
+      ],
+      "accent_beat_frames": []
+    }
+  ],
+  "final_line_id": "closing"
+}

@@ -1,0 +1,2 @@
+# Optional photo codec; JPEG/PNG cataloguing does not require it.
+pillow-heif>=1,<2
