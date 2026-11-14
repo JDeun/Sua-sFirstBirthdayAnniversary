@@ -3,7 +3,7 @@
 import argparse
 from pathlib import Path
 
-from filmtools.faces import align_image, detect
+from face_matchcut import align_image, detect
 from filmtools.models import registered_model
 from filmtools.paths import sha256, write_json
 from filmtools.portraits import upright_rgb

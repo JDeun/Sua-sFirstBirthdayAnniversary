@@ -26,6 +26,7 @@ python3.11 -B tools/run_tests.py
 | `analyze_music.py` | `--audio AUDIO --output MAP` | 측정한 비트·온셋·RMS 에너지 |
 | `align_lyrics.py` | `--audio AUDIO --lyrics TEXT --phrases SPEC --language LANG --output CUES --native-output NATIVE` | 고정된 로컬 모델을 이용한 선택적 가사 정렬 |
 | `align_faces.py` | `--source PHOTO --output REPORT` | YuNet 얼굴 후보와 눈 좌표 |
+| `build_matchcut.py` | `--config APPROVED --output-directory NEW_DIR` | 승인한 눈 좌표·해시로 정렬 사진과 공용 재생 목록 생성 |
 | `cutout_subject.py` | `--source PHOTO --annotations JSON --output RGBA.png --report REPORT` | 외부 다각형으로 원본 RGB를 보존한 알파 마스크 |
 | `tone_image.py` | `--source PHOTO --parameters JSON --output IMAGE --report REPORT` | 선형 광량 공간에서 제한된 노출·RGB·채도 보정 |
 | `validate_project.py` | `--runtime-directory DIR` | 구조·연속성·날짜·원본 중복 검사 |
@@ -33,6 +34,8 @@ python3.11 -B tools/run_tests.py
 각 도구의 전체 옵션은 `--help`로 확인한다. `prepare_project.py --check`는 원본·자산의 존재, 해시, 실제 영상의 마지막 소스 프레임 범위도 검사한다.
 
 얼굴 정렬은 `--face-index N --target-eyes LX LY RX RY --aligned-output IMAGE --size W H`로 대상을 명시한다. 정렬 오차는 기하학적 잔차이며 사람·주석의 정확도를 보증하지 않는다. 누끼 주석은 원본을 바르게 세운 `annotation_size` 좌표를 사용하며 전체 캔버스와 RGB를 보존한다. 주석 구조는 `schemas/cutout.schema.json`에 있다.
+
+검출·정렬의 실제 구현은 독립 [face_matchcut 패키지](face_matchcut/README.md)에 있다. `filmtools.faces`는 기존 호출을 위한 재노출만 하며 알고리즘을 중복 보관하지 않는다. 일괄 입력의 `source_directory`, 눈 좌표·해시와 결과 목록을 다른 템플릿에 연결하는 방법은 [매치컷 모듈 안내](../docs/face-matchcut.md)를 따른다.
 
 가사 정렬에는 `--registry`, `--model-directory`, `--from-result`, `--music-map`도 사용할 수 있다. 기존 추정값을 다시 사용해도 음원·텍스트·모델·언어 해시가 일치해야 한다. 구절 구조는 `schemas/lyric-phrases.schema.json`에 있다. 자동 시각과 측정한 비트 위상은 청취로 확인한다.
 
@@ -84,10 +87,16 @@ tools/align_faces.py
 tools/align_lyrics.py
 tools/analyze_music.py
 tools/build_demo.py
+tools/build_matchcut.py
 tools/cached_runtime.py
 tools/catalog_media.py
 tools/check_endpoint_frames.py
 tools/cutout_subject.py
+tools/face_matchcut/README.md
+tools/face_matchcut/__init__.py
+tools/face_matchcut/alignment.py
+tools/face_matchcut/detection.py
+tools/face_matchcut/geometry.py
 tools/filmtools/__init__.py
 tools/filmtools/checks.py
 tools/filmtools/cutout.py
@@ -104,6 +113,7 @@ tools/requirements-alignment.txt
 tools/requirements-heic.txt
 tools/run_tests.py
 tools/tests/test_algorithms.py
+tools/tests/test_face_matchcut.py
 tools/tests/test_paths_and_staging.py
 tools/tests/test_timeline.py
 tools/tone_image.py

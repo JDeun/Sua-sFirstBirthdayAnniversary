@@ -7,6 +7,7 @@
 - `renderer/src/generated`, `renderer/public`, `node_modules`, 실행 환경과 작업 캐시는 Git에서 제외한다.
 - 샘플에는 코드로 만든 단순 도형과 새로 작성한 예시 문구를 사용한다.
 - 도형은 `renderer/src/assets/`에서 관리하고 개인 데이터 없는 `src/asset-index.ts`로 미리본다. 에셋 분리는 기존 장면의 배치·프레임 시계를 보존한다.
+- 얼굴 매치컷의 재생·타입·컷 계산은 `renderer/src/modules/face-matchcut/`, 검출·정렬은 `tools/face_matchcut/`에서 관리한다. 공용 모듈이 개인 JSON·가사·테마를 읽지 않도록 유지하고 프로젝트 어댑터에서 연결한다.
 - 모델은 `models/registry.json`의 출처·라이선스·SHA256을 확인한다. 다른 가중치를 같은 파일명으로 교체하지 않는다.
 - 얼굴은 실제 픽셀의 기하학적 정렬과 마스크로 다룬다. 재생성한 아이 얼굴을 섞지 않는다.
 - 날짜와 기념일, 사용자 승인·추정 범위를 편집 데이터에 남긴다.

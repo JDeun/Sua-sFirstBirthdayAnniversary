@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "remotion studio src/index.ts",
     "assets:dev": "remotion studio src/asset-index.ts",
+    "matchcut:dev": "remotion studio src/matchcut-index.ts",
+    "test:matchcut": "node --test scripts/test-face-matchcut.mjs",
     "typecheck": "tsc --noEmit",
     "bundle": "remotion bundle src/index.ts",
     "preflight": "node scripts/verify-headless.mjs --preflight",

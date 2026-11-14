@@ -10,6 +10,8 @@
 | --- | --- |
 | `renderer/` | 서사 장면, 파스텔 우주 배경, 매치컷, 키네틱 타이포그래피, 별·왕관·선물 모션 |
 | `renderer/src/assets/` | 기존 도형과 달·행성·별똥별·구름·성·풍선 등 코드 에셋 11종 |
+| `renderer/src/modules/face-matchcut/` | 개인 데이터·음악·테마 없이 재사용하는 얼굴 매치컷 재생 모듈 |
+| `tools/face_matchcut/` | 템플릿과 독립적인 얼굴 검출·기하학적 정렬 라이브러리 |
 | `tools/` | 미디어 목록, 촬영일·중복·편집표 검증, 얼굴 정렬, 비트 분석, 로컬 가사 정렬, 누끼·톤 조정 |
 | `schemas/` | 프로젝트와 편집 데이터의 구조 |
 | `examples/` | 실제 인물과 음악을 사용하지 않는 도형 예제 |
@@ -17,9 +19,11 @@
 | `scripts/` | 모델 검증과 공개 파일 검사 |
 | `docs/legacy-ideas.md` | 초기 스캐폴딩에서 남긴 제작 원칙 |
 
-권장 로컬 배치는 다음과 같다. 개인 파일은 Git 저장소의 형제 폴더에 둔다.
-
 설치 후 에셋만 먼저 보려면 `npm run assets:dev --prefix renderer`를 실행한다. 이 진입점은 개인 runtime이나 미디어를 준비할 필요가 없다. 종류·배치·음악 시계·합성 방법은 [에셋 안내](docs/asset-library.md)에 있다.
+
+얼굴 매치컷만 확인하려면 `npm run matchcut:dev --prefix renderer`를 실행한다. 도형으로 만든 독립 예제이며 개인 자료나 얼굴 모델이 필요 없다. 다른 템플릿으로 옮기는 방법과 정렬 흐름은 [매치컷 모듈 안내](docs/face-matchcut.md)에 있다.
+
+권장 로컬 배치는 다음과 같다. 개인 파일은 Git 저장소의 형제 폴더에 둔다.
 
 ```text
 workspace/
@@ -89,7 +93,7 @@ npm run typecheck --prefix renderer
 npm run preflight --prefix renderer
 ```
 
-헤드리스 출력 명령은 `renderer/scripts/verify-headless.mjs --help`와 렌더러의 `verify:headless` 스크립트를 사용한다. 렌더 브라우저는 렌더러 폴더에서 `npx remotion browser ensure`로 준비한다. 자동 CI는 도형 예제와 에셋 목록을 각각3프레임 렌더한다. 검사와 실제 시청·청취의 범위는 [검수 안내](docs/validation.md)에 있다.
+헤드리스 출력 명령은 `renderer/scripts/verify-headless.mjs --help`와 렌더러의 `verify:headless` 스크립트를 사용한다. 렌더 브라우저는 렌더러 폴더에서 `npx remotion browser ensure`로 준비한다. 자동 CI는 도형 본편·에셋 목록·독립 매치컷을 각각3프레임 렌더한다. 검사와 실제 시청·청취의 범위는 [검수 안내](docs/validation.md)에 있다.
 
 ## 제작 흐름
 
