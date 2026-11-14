@@ -1,0 +1,329 @@
+{
+  "status": "auto_aligned_review_required",
+  "review_status": "not_reviewed",
+  "song_asset": "",
+  "fps": 30,
+  "method": "synthetic fixture; no audio alignment",
+  "occurrences": [
+    {
+      "id": "demo",
+      "song_start_frame": 0,
+      "song_end_frame": 30,
+      "cues": [
+        {
+          "id": "star",
+          "text": "Demo",
+          "start_frame": 0,
+          "end_frame": 6,
+          "start_seconds": 0.0,
+          "end_seconds": 0.2,
+          "words": [
+            {
+              "text": "Demo",
+              "start_frame": 0,
+              "end_frame": 6,
+              "start_seconds": 0.0,
+              "end_seconds": 0.2,
+              "char_start": 0,
+              "char_end": 4
+            }
+          ],
+          "accent_beat_frames": []
+        },
+        {
+          "id": "princess",
+          "text": "Demo",
+          "start_frame": 6,
+          "end_frame": 12,
+          "start_seconds": 0.2,
+          "end_seconds": 0.4,
+          "words": [
+            {
+              "text": "Demo",
+              "start_frame": 6,
+              "end_frame": 12,
+              "start_seconds": 0.2,
+              "end_seconds": 0.4,
+              "char_start": 0,
+              "char_end": 4
+            }
+          ],
+          "accent_beat_frames": []
+        },
+        {
+          "id": "universe",
+          "text": "Demo",
+          "start_frame": 12,
+          "end_frame": 18,
+          "start_seconds": 0.4,
+          "end_seconds": 0.6,
+          "words": [
+            {
+              "text": "Demo",
+              "start_frame": 12,
+              "end_frame": 18,
+              "start_seconds": 0.4,
+              "end_seconds": 0.6,
+              "char_start": 0,
+              "char_end": 4
+            }
+          ],
+          "accent_beat_frames": []
+        },
+        {
+          "id": "tremor",
+          "text": "Demo",
+          "start_frame": 18,
+          "end_frame": 24,
+          "start_seconds": 0.6,
+          "end_seconds": 0.8,
+          "words": [
+            {
+              "text": "Demo",
+              "start_frame": 18,
+              "end_frame": 24,
+              "start_seconds": 0.6,
+              "end_seconds": 0.8,
+              "char_start": 0,
+              "char_end": 4
+            }
+          ],
+          "accent_beat_frames": []
+        },
+        {
+          "id": "shelter",
+          "text": "Demo",
+          "start_frame": 24,
+          "end_frame": 30,
+          "start_seconds": 0.8,
+          "end_seconds": 1.0,
+          "words": [
+            {
+              "text": "Demo",
+              "start_frame": 24,
+              "end_frame": 30,
+              "start_seconds": 0.8,
+              "end_seconds": 1.0,
+              "char_start": 0,
+              "char_end": 4
+            }
+          ],
+          "accent_beat_frames": []
+        }
+      ],
+      "full_cues": [
+        {
+          "id": "star",
+          "text": "Demo",
+          "start_frame": 0,
+          "end_frame": 6,
+          "start_seconds": 0.0,
+          "end_seconds": 0.2,
+          "words": [
+            {
+              "text": "Demo",
+              "start_frame": 0,
+              "end_frame": 6,
+              "start_seconds": 0.0,
+              "end_seconds": 0.2,
+              "char_start": 0,
+              "char_end": 4
+            }
+          ],
+          "accent_beat_frames": []
+        },
+        {
+          "id": "princess",
+          "text": "Demo",
+          "start_frame": 6,
+          "end_frame": 12,
+          "start_seconds": 0.2,
+          "end_seconds": 0.4,
+          "words": [
+            {
+              "text": "Demo",
+              "start_frame": 6,
+              "end_frame": 12,
+              "start_seconds": 0.2,
+              "end_seconds": 0.4,
+              "char_start": 0,
+              "char_end": 4
+            }
+          ],
+          "accent_beat_frames": []
+        },
+        {
+          "id": "universe",
+          "text": "Demo",
+          "start_frame": 12,
+          "end_frame": 18,
+          "start_seconds": 0.4,
+          "end_seconds": 0.6,
+          "words": [
+            {
+              "text": "Demo",
+              "start_frame": 12,
+              "end_frame": 18,
+              "start_seconds": 0.4,
+              "end_seconds": 0.6,
+              "char_start": 0,
+              "char_end": 4
+            }
+          ],
+          "accent_beat_frames": []
+        },
+        {
+          "id": "tremor",
+          "text": "Demo",
+          "start_frame": 18,
+          "end_frame": 24,
+          "start_seconds": 0.6,
+          "end_seconds": 0.8,
+          "words": [
+            {
+              "text": "Demo",
+              "start_frame": 18,
+              "end_frame": 24,
+              "start_seconds": 0.6,
+              "end_seconds": 0.8,
+              "char_start": 0,
+              "char_end": 4
+            }
+          ],
+          "accent_beat_frames": []
+        },
+        {
+          "id": "shelter",
+          "text": "Demo",
+          "start_frame": 24,
+          "end_frame": 30,
+          "start_seconds": 0.8,
+          "end_seconds": 1.0,
+          "words": [
+            {
+              "text": "Demo",
+              "start_frame": 24,
+              "end_frame": 30,
+              "start_seconds": 0.8,
+              "end_seconds": 1.0,
+              "char_start": 0,
+              "char_end": 4
+            }
+          ],
+          "accent_beat_frames": []
+        },
+        {
+          "id": "star-repeat",
+          "text": "Demo",
+          "start_frame": 30,
+          "end_frame": 36,
+          "start_seconds": 1.0,
+          "end_seconds": 1.2,
+          "words": [
+            {
+              "text": "Demo",
+              "start_frame": 30,
+              "end_frame": 36,
+              "start_seconds": 1.0,
+              "end_seconds": 1.2,
+              "char_start": 0,
+              "char_end": 4
+            }
+          ],
+          "accent_beat_frames": []
+        },
+        {
+          "id": "princess-repeat",
+          "text": "Demo",
+          "start_frame": 36,
+          "end_frame": 42,
+          "start_seconds": 1.2,
+          "end_seconds": 1.4,
+          "words": [
+            {
+              "text": "Demo",
+              "start_frame": 36,
+              "end_frame": 42,
+              "start_seconds": 1.2,
+              "end_seconds": 1.4,
+              "char_start": 0,
+              "char_end": 4
+            }
+          ],
+          "accent_beat_frames": []
+        },
+        {
+          "id": "gift",
+          "text": "Demo",
+          "start_frame": 42,
+          "end_frame": 48,
+          "start_seconds": 1.4,
+          "end_seconds": 1.6,
+          "words": [
+            {
+              "text": "Demo",
+              "start_frame": 42,
+              "end_frame": 48,
+              "start_seconds": 1.4,
+              "end_seconds": 1.6,
+              "char_start": 0,
+              "char_end": 4
+            }
+          ],
+          "accent_beat_frames": []
+        },
+        {
+          "id": "love",
+          "text": "Demo",
+          "start_frame": 48,
+          "end_frame": 54,
+          "start_seconds": 1.6,
+          "end_seconds": 1.8,
+          "words": [
+            {
+              "text": "Demo",
+              "start_frame": 48,
+              "end_frame": 54,
+              "start_seconds": 1.6,
+              "end_seconds": 1.8,
+              "char_start": 0,
+              "char_end": 4
+            }
+          ],
+          "accent_beat_frames": []
+        },
+        {
+          "id": "prayer",
+          "text": "Demo",
+          "start_frame": 54,
+          "end_frame": 60,
+          "start_seconds": 1.8,
+          "end_seconds": 2.0,
+          "words": [
+            {
+              "text": "Demo",
+              "start_frame": 54,
+              "end_frame": 60,
+              "start_seconds": 1.8,
+              "end_seconds": 2.0,
+              "char_start": 0,
+              "char_end": 4
+            }
+          ],
+          "accent_beat_frames": []
+        }
+      ],
+      "full_end_frame": 60,
+      "full_lyric_lines": [
+        "Demo",
+        "Demo",
+        "Demo",
+        "Demo",
+        "Demo",
+        "Demo",
+        "Demo",
+        "Demo"
+      ]
+    }
+  ]
+}

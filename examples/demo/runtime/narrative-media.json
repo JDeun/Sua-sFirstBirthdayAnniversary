@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "status": "ready",
+  "fps": 30,
+  "assets": {
+    "scene-a": {
+      "asset": "demo/scene-a.svg",
+      "original": "media/scene-a.svg",
+      "kind": "photo",
+      "dimensions": [
+        640,
+        800
+      ],
+      "framing": "context",
+      "preserveContext": true,
+      "face": [
+        0.5,
+        0.34
+      ],
+      "head": [
+        0.5,
+        0.12
+      ]
+    },
+    "scene-b": {
+      "asset": "demo/scene-b.svg",
+      "original": "media/scene-b.svg",
+      "kind": "photo",
+      "dimensions": [
+        640,
+        800
+      ],
+      "framing": "context",
+      "preserveContext": true,
+      "face": [
+        0.5,
+        0.34
+      ],
+      "head": [
+        0.5,
+        0.12
+      ]
+    }
+  }
+}

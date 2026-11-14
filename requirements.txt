@@ -1,0 +1,8 @@
+# Python 3.11; ffmpeg and ffprobe are external executables.
+numpy>=1.26.4,<3
+Pillow>=12.3,<14
+opencv-python>=4.10,<6
+librosa==0.11.0
+scipy>=1.17,<2
+# Optional HEIC decoder: tools/requirements-heic.txt
+# Optional local known-lyric alignment: tools/requirements-alignment.txt

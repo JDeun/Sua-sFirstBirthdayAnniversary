@@ -1,0 +1,188 @@
+{
+  "schema_version": "1.0",
+  "status": "ready",
+  "revision": "synthetic-demo",
+  "fps": 30,
+  "render_directory": "demo",
+  "main_duration_in_frames": 120,
+  "total_frames": 120,
+  "opening": {
+    "mode": "none",
+    "ultrasound_frames": 0,
+    "matchcut_frames": 0,
+    "matchcut_mode": "full",
+    "title_start_frame": 0,
+    "birth_start_frame": 0,
+    "duration_in_frames": 0,
+    "heartbeat": {
+      "enabled": false
+    }
+  },
+  "choruses": [],
+  "shots": [
+    {
+      "id": "scene-a",
+      "usage": "baseline",
+      "chapter": 0,
+      "kind": "photo",
+      "canonical_original_source": "media/scene-a.svg",
+      "captured_at": "2000-01-01T00:00:00Z",
+      "date_basis": {
+        "status": "fictional_demo_timestamp"
+      },
+      "song_start_frame": 0,
+      "song_end_frame": 60,
+      "duration_in_frames": 60,
+      "caption": "A new chapter",
+      "captionCues": [],
+      "lyricOwned": false,
+      "frameLayout": {
+        "family": "contact-print",
+        "media": {
+          "x": 1040,
+          "y": 90,
+          "width": 720,
+          "height": 900
+        },
+        "words": {
+          "x": 140,
+          "y": 300,
+          "width": 780,
+          "height": 400
+        },
+        "radius": 0,
+        "mat": 0,
+        "tilt": 0,
+        "align": "left",
+        "typeSize": 100,
+        "shade": "cream",
+        "typeface": "sans",
+        "inset": 0
+      }
+    },
+    {
+      "id": "scene-b",
+      "usage": "baseline",
+      "chapter": 1,
+      "kind": "photo",
+      "canonical_original_source": "media/scene-b.svg",
+      "captured_at": "2000-01-02T00:00:00Z",
+      "date_basis": {
+        "status": "fictional_demo_timestamp"
+      },
+      "song_start_frame": 60,
+      "song_end_frame": 120,
+      "duration_in_frames": 60,
+      "caption": "Keep growing",
+      "captionCues": [],
+      "lyricOwned": false,
+      "frameLayout": {
+        "family": "contact-print",
+        "media": {
+          "x": 1040,
+          "y": 90,
+          "width": 720,
+          "height": 900
+        },
+        "words": {
+          "x": 140,
+          "y": 300,
+          "width": 780,
+          "height": 400
+        },
+        "radius": 0,
+        "mat": 0,
+        "tilt": 0,
+        "align": "left",
+        "typeSize": 100,
+        "shade": "cream",
+        "typeface": "sans",
+        "inset": 0
+      }
+    }
+  ],
+  "assets": {
+    "scene-a": {
+      "asset": "demo/scene-a.svg",
+      "original": "media/scene-a.svg",
+      "kind": "photo",
+      "dimensions": [
+        640,
+        800
+      ],
+      "framing": "context",
+      "preserveContext": true,
+      "face": [
+        0.5,
+        0.34
+      ],
+      "head": [
+        0.5,
+        0.12
+      ]
+    },
+    "scene-b": {
+      "asset": "demo/scene-b.svg",
+      "original": "media/scene-b.svg",
+      "kind": "photo",
+      "dimensions": [
+        640,
+        800
+      ],
+      "framing": "context",
+      "preserveContext": true,
+      "face": [
+        0.5,
+        0.34
+      ],
+      "head": [
+        0.5,
+        0.12
+      ]
+    }
+  },
+  "outro_alignment": {
+    "fps": 30,
+    "status": "synthetic_demo",
+    "review_status": "synthetic",
+    "lines": [
+      {
+        "id": "closing",
+        "text": "Final chapter",
+        "start_frame": 90,
+        "end_frame": 120,
+        "start_seconds": 3.0,
+        "end_seconds": 4.0,
+        "words": [
+          {
+            "text": "Final chapter",
+            "start_frame": 90,
+            "end_frame": 120,
+            "start_seconds": 3.0,
+            "end_seconds": 4.0,
+            "char_start": 0,
+            "char_end": 12
+          }
+        ],
+        "accent_beat_frames": []
+      }
+    ],
+    "final_line_id": "closing"
+  },
+  "rhythm": {
+    "beat_frames": [],
+    "tempo_bpm": 0,
+    "source": "none"
+  },
+  "memory_audio": {
+    "enabled": false,
+    "shot_id": "scene-a",
+    "asset": "",
+    "source_gain": 0,
+    "source_window_frames": [
+      0,
+      60
+    ],
+    "source_fade_frames": 4
+  }
+}

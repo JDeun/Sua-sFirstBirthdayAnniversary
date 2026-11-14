@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "External film project paths",
+  "type": "object",
+  "required": [
+    "runtime_directory",
+    "asset_directory",
+    "media_directory",
+    "output_directory"
+  ],
+  "properties": {
+    "runtime_directory": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*\\\\)(?!.*:).+$"
+    },
+    "asset_directory": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*\\\\)(?!.*:).+$"
+    },
+    "media_directory": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*\\\\)(?!.*:).+$"
+    },
+    "output_directory": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*\\\\)(?!.*:).+$"
+    },
+    "renderer_directory": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*\\\\)(?!.*:).+$"
+    },
+    "staging_mode": {
+      "enum": [
+        "symlink",
+        "copy"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

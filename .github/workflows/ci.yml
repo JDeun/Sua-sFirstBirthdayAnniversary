@@ -1,99 +1,46 @@
-name: Scaffold CI
-concurrency:
-  group: scaffold-ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+name: Template checks
+
 on:
+  pull_request:
   push:
     branches: [main]
-  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
-  python:
-    runs-on: ubuntu-latest
+  validate:
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      - name: Install package
-        run: python -m pip install -e .
-      - name: Install FFmpeg for QA tests
-        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
-      - name: Unit tests (synthetic files only)
-        run: python -m unittest discover -s tests -v
-  video:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: video
-    steps:
-      - uses: actions/checkout@v4
+          python-version: '3.11'
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
-      - run: npm install --no-audit --no-fund
-      - run: npm run typecheck
-      - name: Validate Remotion composition bundling
-        run: npx remotion compositions src/index.ts
-      - name: Smoke-render synthetic opening frame
-        run: npx remotion still src/index.ts OpeningSequence out/opening-smoke.png --frame=239 --scale=0.25
-      - name: Smoke-render synthetic full-film frame
-        run: npx remotion still src/index.ts BirthdayFilm out/film-smoke.png --frame=450 --scale=0.25
-
-      - name: Smoke-render transition boundaries as MP4 (synthetic only)
-        run: npx remotion render src/index.ts OpeningSequence out/opening-transitions.mp4 --frames=235-465 --scale=0.25 --codec=h264 --concurrency=2
-
-      - name: Install FFmpeg for synthetic integration fixtures
-        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
-      - name: Generate synthetic birth video and story soundtrack
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: renderer/package-lock.json
+      - name: Install local tool dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Check public boundary and pinned model
         run: |
-          mkdir -p public/media/birth
-          ffmpeg -hide_banner -loglevel error -y -f lavfi -i testsrc2=size=320x180:rate=30 -f lavfi -i sine=frequency=440:sample_rate=48000 -t 5 -c:v libx264 -pix_fmt yuv420p -c:a aac public/media/birth/ci-birth.mp4
-          ffmpeg -hide_banner -loglevel error -y -f lavfi -i sine=frequency=330:sample_rate=48000 -t 90 -c:a aac public/media/birth/ci-song.m4a
-      - name: Render synthetic birth footage and song boundary
+          python scripts/audit_public.py
+          python scripts/setup_models.py
+          python -m unittest discover -s tests -v
+      - name: Check media algorithms and project preparation
+        run: python -B tools/run_tests.py
+      - name: Stage synthetic geometry fixture
+        run: python -B tools/prepare_project.py --config examples/demo/project.json --copy
+      - name: Install locked renderer dependencies
+        run: npm ci --prefix renderer
+      - name: Check renderer types and preflight
         run: |
-          cat > /tmp/ci-opening-props.json <<'EOF'
-          {"imagePaths":[],"musicPath":"media/birth/ci-song.m4a","birthClip":{"path":"media/birth/ci-birth.mp4","sourceStartFrame":0,"withAudio":true},"timing":{"matchcutEndFrame":240,"birthEndFrame":360,"songStartFrame":450}}
-          EOF
-          npx remotion render src/index.ts OpeningSequence out/birth-integration.mp4 --props=/tmp/ci-opening-props.json --frames=235-465 --scale=0.25 --codec=h264 --concurrency=2
-          ffprobe -v error -show_entries stream=codec_type -of csv=p=0 out/birth-integration.mp4 | grep -q audio
-          python ../scripts/check_audio_boundaries.py out/birth-integration.mp4
-
-      - name: Render complete synthetic BirthdayFilm (scaled CI preview)
+          npm run typecheck --prefix renderer
+          npm run preflight --prefix renderer
+      - name: Render three synthetic frames
+        working-directory: renderer
         run: |
-          cat > /tmp/ci-full-film-props.json <<'EOF'
-          {"opening":{"imagePaths":[],"musicPath":"media/birth/ci-song.m4a","timing":{"matchcutEndFrame":240,"birthEndFrame":360,"songStartFrame":450}},"songDurationFrames":2700,"endCardFrames":120,"shots":[]}
-          EOF
-          npx remotion render src/index.ts BirthdayFilm out/full-synthetic-film.mp4 --props=/tmp/ci-full-film-props.json --scale=0.25 --codec=h264 --concurrency=2
-          python ../scripts/check_final_render.py out/full-synthetic-film.mp4 --expected-frames=3150 --black-detect --max-black-seconds=0.5
-
-      - name: Install local Python film tools for cross-language E2E
-        run: python -m pip install -e ..
-      - name: Render approved synthetic photo and video through Python film pipeline
-        run: |
-          mkdir -p /tmp/sua-e2e
-          ffmpeg -hide_banner -loglevel error -y -f lavfi -i color=c=blue:s=640x360 -frames:v 1 /tmp/sua-e2e/photo.png
-          ffmpeg -hide_banner -loglevel error -y -f lavfi -i testsrc2=size=640x360:rate=30 -t 5 -an -c:v libx264 -pix_fmt yuv420p /tmp/sua-e2e/story.mp4
-          ffmpeg -hide_banner -loglevel error -y -f lavfi -i sine=frequency=520:sample_rate=48000 -t 9 -c:a aac /tmp/sua-e2e/song.m4a
-          cat > /tmp/sua-e2e/approved.json <<'EOF'
-          {"shots":[{"source":"photo.png","cut_at_seconds":0,"chapter":"First"},{"source":"story.mp4","cut_at_seconds":3,"chapter":"Growth","start_seconds":0}]}
-          EOF
-          cat > /tmp/sua-e2e/opening.json <<'EOF'
-          {"imagePaths":[],"timing":{"matchcutEndFrame":240,"birthEndFrame":360,"songStartFrame":450}}
-          EOF
-          python -m sua_media.film --approved /tmp/sua-e2e/approved.json --opening-props /tmp/sua-e2e/opening.json --song /tmp/sua-e2e/song.m4a --public-dir public --props /tmp/sua-e2e/props.json --end-card-seconds 2
-          npx remotion render src/index.ts BirthdayFilm out/approved-synthetic-film.mp4 --props=/tmp/sua-e2e/props.json --scale=0.25 --codec=h264 --concurrency=2
-          python ../scripts/check_final_render.py out/approved-synthetic-film.mp4 --expected-frames=720
-
-      - name: Single-command synthetic production E2E and QA report
-        run: |
-          mkdir -p /tmp/sua-produce
-          ffmpeg -hide_banner -loglevel error -y -f lavfi -i color=c=green:s=640x360 -frames:v 1 /tmp/sua-produce/photo.png
-          ffmpeg -hide_banner -loglevel error -y -f lavfi -i sine=frequency=420:sample_rate=48000 -t 7 -c:a aac /tmp/sua-produce/song.m4a
-          cat > /tmp/sua-produce/approved.json <<'EOF'
-          {"shots":[{"source":"photo.png","chapter":"Synthetic QA"}]}
-          EOF
-          cat > /tmp/sua-produce/opening.json <<'EOF'
-          {"imagePaths":[],"timing":{"matchcutEndFrame":240,"birthEndFrame":360,"songStartFrame":450}}
-          EOF
-          python -m sua_media.produce --approved /tmp/sua-produce/approved.json --opening-props /tmp/sua-produce/opening.json --song /tmp/sua-produce/song.m4a --video-dir . --public-dir public --props /tmp/sua-produce/props.json --output /tmp/sua-produce/final.mp4 --report /tmp/sua-produce/qa.json --end-card-seconds 2 --scale 0.25
-          python -c 'import json; p=json.load(open("/tmp/sua-produce/qa.json")); assert p["status"]=="pass", p'
+          npx remotion browser ensure
+          npx remotion render src/index.ts FamilyFilm ../.cache/demo-smoke.mp4 --frames=0-2 --codec=h264

@@ -1,0 +1,5 @@
+# Optional CPU alignment only. Checkpoints are supplied through models/registry.json.
+# No tool downloads weights or installs packages.
+stable-ts==2.19.1
+openai-whisper==20250625
+torch>=2.6,<3
