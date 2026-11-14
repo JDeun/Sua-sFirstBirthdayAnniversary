@@ -1,8 +1,9 @@
 // Copyright (c) JDeun. All rights reserved. Third-party licenses apply separately.
 import {COPY, copyText} from '../copy';
 import {Audio, Video} from '@remotion/media';
-import {AbsoluteFill, CanvasImage, interpolate, Sequence, staticFile, useCurrentFrame} from 'remotion';
-import {OPENING_PHOTOS as allowed} from '../opening-media';
+import {AbsoluteFill, interpolate, Sequence, staticFile, useCurrentFrame} from 'remotion';
+import {OPENING_MATCHCUT_PHOTOS as allowed} from '../opening-media';
+import {FaceMatchcut, sampleMatchcutPhotos} from '../modules/face-matchcut';
 import {Greeting} from '../Greeting';
 import {FILM} from '../theme';
 import {NARRATIVE} from './edit';
@@ -45,13 +46,9 @@ const Prenatal = () => {
 const ReverseMemories = () => {
   if (!allowed.length) return null;
   const collection = opening.matchcut_mode === 'full' ? allowed :
-    Array.from({length: 90}, (_, i) => allowed[Math.round(i * (allowed.length - 1) / 89)]);
-  return <AbsoluteFill>{collection.map((photo, index) => <Sequence key={`${index}-${photo.stem}`}
-    from={Math.round(index * opening.matchcut_frames / collection.length)}
-    durationInFrames={Math.round((index + 1) * opening.matchcut_frames / collection.length) -
-      Math.round(index * opening.matchcut_frames / collection.length)}>
-    <CanvasImage src={staticFile(photo.asset)} width={1920} height={1080} fit="fill" />
-  </Sequence>)}<div style={{position: 'absolute', inset: 38, borderRadius: 30,
+    sampleMatchcutPhotos(allowed, 90);
+  return <AbsoluteFill><FaceMatchcut photos={collection} durationInFrames={opening.matchcut_frames} />
+    <div style={{position: 'absolute', inset: 38, borderRadius: 30,
     border: '2px solid rgba(255,248,240,0.42)', pointerEvents: 'none'}} /></AbsoluteFill>;
 };
 

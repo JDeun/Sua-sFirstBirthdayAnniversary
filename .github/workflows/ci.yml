@@ -38,6 +38,7 @@ jobs:
       - name: Check renderer types and preflight
         run: |
           npm run typecheck --prefix renderer
+          npm run test:matchcut --prefix renderer
           npm run preflight --prefix renderer
       - name: Render three synthetic frames
         working-directory: renderer
@@ -47,3 +48,6 @@ jobs:
       - name: Render the code-only asset catalog
         working-directory: renderer
         run: npx remotion render src/asset-index.ts AssetCatalog ../.cache/assets-smoke.mp4 --frames=30-32 --codec=h264
+      - name: Render across an independent matchcut boundary
+        working-directory: renderer
+        run: npx remotion render src/matchcut-index.ts FaceMatchcutDemo ../.cache/matchcut-smoke.mp4 --frames=4-6 --codec=h264

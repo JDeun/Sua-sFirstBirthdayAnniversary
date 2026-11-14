@@ -10,10 +10,11 @@
 | `python -B tools/run_tests.py` | 미디어 정렬·날짜·중복·프로젝트 스테이징 등의 검사 |
 | `tools/prepare_project.py --config … --check` | 외부 프로젝트 데이터와 실제 사용 자산의 연결 |
 | `npm run typecheck --prefix renderer` | 렌더러와 에셋의 타입 검사 |
+| `npm run test:matchcut --prefix renderer` | 공용 매치컷의 경계·속도·제외·독립 의존성 검사 |
 | `npm run preflight --prefix renderer` | 연결된 프로젝트의 구성·자산 참조·배치와 새 번들 생성 |
-| GitHub CI의 렌더 | 도형 예제와 코드 에셋 목록의 실제 브라우저 렌더 |
+| GitHub CI의 렌더 | 도형 본편·코드 에셋 목록·독립 매치컷 경계의 실제 브라우저 렌더 |
 
-개인 설정을 바꿔 준비할 때는 [도구 안내](../tools/README.md), 독립 에셋은 [에셋 안내](asset-library.md)를 따른다. 외부 설정 파일을 사용하는 헤드리스 검사의 옵션은 `node renderer/scripts/verify-headless.mjs --help`에서 확인한다.
+개인 설정을 바꿔 준비할 때는 [도구 안내](../tools/README.md), 독립 에셋은 [에셋 안내](asset-library.md), 얼굴 매치컷은 [모듈 안내](face-matchcut.md)를 따른다. 외부 설정 파일을 사용하는 헤드리스 검사의 옵션은 `node renderer/scripts/verify-headless.mjs --help`에서 확인한다.
 
 시간순 검사는 원본 날짜의 정밀도와 가족이 확인한 기념일을 함께 사용한다. 촬영 시각을 모르는 두 구간이 겹치면 검토 대상으로 남기며, 시간순을 입증했다고 표시하지 않는다.
 

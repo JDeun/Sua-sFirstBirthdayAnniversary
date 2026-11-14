@@ -18,3 +18,5 @@ python3 scripts/setup_models.py --model whisper-small --cache-dir ../work/models
 ```
 
 모델 실행과 미디어 처리는 로컬에서 수행한다. 이름·얼굴·가사 등의 개인 자료는 모델 파일에 포함하지 않는다. 자동 정렬 결과의 얼굴·각도·가사 시점은 실제 화면과 청취로 검토한다.
+
+얼굴 매치컷의 독립 `tools/face_matchcut` 패키지는 모델 경로를 호출자로부터 받는다. 눈 좌표가 이미 검토된 일괄 정렬은 YuNet을 실행하지 않으므로 모델을 중복 설치하지 않아도 된다. 사용법은 [매치컷 안내](../docs/face-matchcut.md)에 있다.
