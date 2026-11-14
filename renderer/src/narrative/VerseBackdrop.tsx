@@ -1,6 +1,6 @@
 // Copyright (c) JDeun. All rights reserved. Third-party licenses apply separately.
-import {Halo, QuietStars, SubjectOrbits} from '../shared/space';
-import {StarBloom} from '../performance/graphics';
+import {Halo, QuietStars, SubjectOrbits} from '../assets/space';
+import {StarBloom} from '../assets/stars-and-crown';
 import {FILM} from '../theme';
 import type {FrameLayout, StoryShot} from './FrameLayout';
 import {VERSE_OUTRO_START, verseBeat, verseEase, verseQuiet, verseShotFrame,

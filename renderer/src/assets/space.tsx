@@ -5,7 +5,7 @@ const POINTS = [
   [104, 132], [280, 864], [1610, 140], [1810, 352], [1700, 910], [1120, 968],
 ] as const;
 
-/** Sparse and entirely behind Sua. No particle ever passes over her expression. */
+/** Sparse and behind the subject. No particle crosses the face. */
 export const QuietStars = ({frame, color}: {
   readonly frame: number;
   readonly color: string;
