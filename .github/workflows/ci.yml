@@ -44,3 +44,6 @@ jobs:
         run: |
           npx remotion browser ensure
           npx remotion render src/index.ts FamilyFilm ../.cache/demo-smoke.mp4 --frames=0-2 --codec=h264
+      - name: Render the code-only asset catalog
+        working-directory: renderer
+        run: npx remotion render src/asset-index.ts AssetCatalog ../.cache/assets-smoke.mp4 --frames=30-32 --codec=h264

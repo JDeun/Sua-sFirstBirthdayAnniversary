@@ -6,6 +6,7 @@
   "author": "JDeun",
   "scripts": {
     "dev": "remotion studio src/index.ts",
+    "assets:dev": "remotion studio src/asset-index.ts",
     "typecheck": "tsc --noEmit",
     "bundle": "remotion bundle src/index.ts",
     "preflight": "node scripts/verify-headless.mjs --preflight",
