@@ -9,6 +9,7 @@ import {StoryMoment} from './narrative/StoryMoment';
 import {OutroLyrics} from './narrative/OutroLyrics';
 import {NarrativeFonts} from './narrative/NarrativeFonts';
 import {MemorySound} from './narrative/MemorySound';
+import {StoryNarration} from './narrative/StoryNarration';
 
 export const NARRATIVE_FILM_FRAMES = NARRATIVE.total_frames;
 const baselines = NARRATIVE_SHOTS.filter((shot) => shot.usage === 'baseline');
@@ -35,6 +36,7 @@ const FamilyStory = () => {
         <ChorusPerformance occurrenceIndex={window.occurrenceIndex} includeAudio={false}
           sourceAssignments={sources} window={{startFrame: window.start_frame, endFrame: window.end_frame}} />
       </Sequence>)}
+      <StoryNarration />
       <OutroLyrics />
     </AbsoluteFill>
   </>;

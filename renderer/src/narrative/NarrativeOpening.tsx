@@ -93,7 +93,7 @@ export const NarrativeOpening = () => {
       <ReverseMemories /></Sequence> : null}
     {titleFrames > 0 ? <Sequence name={copyText('Greeting.003')} from={opening.title_start_frame}
       durationInFrames={titleFrames}>
-      <Greeting fontFamily={NARRATIVE_FONT} />
+      <Greeting fontFamily={NARRATIVE_FONT} durationInFrames={titleFrames} />
       <div style={{position: 'absolute', inset: 76, borderRadius: 34,
         border: '1px solid rgba(255,248,240,0.14)', pointerEvents: 'none'}} />
     </Sequence> : null}

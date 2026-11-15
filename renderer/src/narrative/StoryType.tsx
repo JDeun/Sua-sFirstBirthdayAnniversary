@@ -1,6 +1,7 @@
 // Copyright (c) JDeun. All rights reserved. Third-party licenses apply separately.
 import type {CaptionCue, FrameLayout, StoryShot} from './FrameLayout';
 import {VerseTypography} from './VerseTypography';
+import {NARRATIVE} from './edit';
 
 const fallbackCue = (shot: StoryShot): readonly CaptionCue[] => shot.caption ? [{
   text: shot.caption, start_frame: shot.song_start_frame + 7,
@@ -11,6 +12,7 @@ const fallbackCue = (shot: StoryShot): readonly CaptionCue[] => shot.caption ? [
 export const StoryType = ({shot, songFrame, layout}: Readonly<{
   shot: StoryShot; songFrame: number; layout: FrameLayout;
 }>) => {
+  if (NARRATIVE.story_captions) return null;
   const event = shot.event;
   const eventActive = event && songFrame >= event.start_frame && songFrame < event.end_frame;
   const active = (shot.captionCues ?? (shot.lyricOwned ? [] : fallbackCue(shot))).filter((cue) =>

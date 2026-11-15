@@ -80,6 +80,39 @@ def validate_copy(data):
     integer(data["opening"]["birth_trim_before"], "birth_trim_before")
     if data.get("song_asset") is not None:
         relative_name(data["song_asset"])
+    if data["assets"].get("greeting"):
+        relative_name(data["assets"]["greeting"])
+
+
+def validate_story_captions(plan):
+    cues = plan.get("story_captions")
+    if cues is None:
+        return
+    if not isinstance(cues, list):
+        raise ValueError("Story captions must be an array")
+    validate_cues(cues, plan["fps"])
+    outro = plan.get("outro_alignment", {})
+    ending = next((line["start_frame"] for line in outro.get("lines", [])
+                   if line["id"] == outro.get("final_line_id")), plan["main_duration_in_frames"])
+    seen = set()
+    for cue in cues:
+        if not isinstance(cue.get("id"), str) or not cue["id"].strip() or cue["id"] in seen:
+            raise ValueError("Story caption ids must be unique and nonempty")
+        lines = cue["text"].split("\n")
+        if len(lines) > 2 or any(not line.strip() for line in lines):
+            raise ValueError("Story captions need one or two nonempty lines")
+        if cue["end_frame"] > min(ending, plan["main_duration_in_frames"]):
+            raise ValueError("Story caption covers the synced outro")
+        if any(cue["start_frame"] < window["end_frame"] and cue["end_frame"] > window["start_frame"]
+               for window in plan["choruses"]):
+            raise ValueError("Story caption covers a chorus")
+        if cue.get("placement", "bottom") not in {"bottom", "left", "right"}:
+            raise ValueError("Invalid story caption placement")
+        if "size" in cue:
+            number(cue["size"], "caption size", positive=True)
+        if any(not isinstance(cue.get(key, ""), str) for key in ("label", "date_label")):
+            raise ValueError("Story caption labels must be strings")
+        seen.add(cue["id"])
 
 
 def validate_runtime(data):
@@ -109,4 +142,5 @@ def validate_runtime(data):
     if any(not isinstance(data[n], list) for n in ("stopmotion.json", "matchcut.json")):
         raise ValueError("Opening sequences must be arrays")
     validate_copy(data["copy.json"])
+    validate_story_captions(plan)
     return result

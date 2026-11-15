@@ -39,6 +39,7 @@ jobs:
         run: |
           npm run typecheck --prefix renderer
           npm run test:matchcut --prefix renderer
+          npm run test:story --prefix renderer
           npm run preflight --prefix renderer
       - name: Render three synthetic frames
         working-directory: renderer
