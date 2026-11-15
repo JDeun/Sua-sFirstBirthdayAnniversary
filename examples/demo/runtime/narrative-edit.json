@@ -184,5 +184,14 @@
       60
     ],
     "source_fade_frames": 4
-  }
+  },
+  "story_captions": [
+    {
+      "id": "demo-narration",
+      "text": "Two pictures, one story",
+      "start_frame": 0,
+      "end_frame": 90,
+      "placement": "bottom"
+    }
+  ]
 }

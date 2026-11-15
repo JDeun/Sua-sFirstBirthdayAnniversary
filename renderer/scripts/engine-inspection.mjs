@@ -132,16 +132,19 @@ export const planStills = (engine) => {
     [opening.title_start_frame, opening.birth_start_frame], [opening.birth_start_frame, offset]];
   const intro = ranges.flatMap(([start, end], index) => end > start ?
     [{label: `opening-${index + 1}`, frame: start + Math.floor((end - start) / 2)}] : []);
+  const greeting = engine.COPY?.assets?.greeting ? [20, 50, 90].filter((frame) =>
+    opening.title_start_frame + frame < opening.birth_start_frame).map((frame) =>
+    ({label: `greeting-${frame}`, frame: opening.title_start_frame + frame})) : [];
+  const narration = (edit.story_captions ?? []).map((cue, index) =>
+    ({label: `story-${index + 1}`, frame: offset + cue.start_frame + Math.floor((cue.end_frame - cue.start_frame) / 2)}));
   const choruses = edit.choruses.flatMap((chorus) => engine.getPerformanceTiming(chorus.occurrenceIndex)
     .occurrence.cues.map((cue, index) => ({label: `chorus-${chorus.occurrenceIndex + 1}-phrase-${index + 1}`,
       frame: offset + Math.min(cue.end_frame - 1, cue.words.at(-1).start_frame + 8)})));
   const closing = edit.outro_alignment?.lines.find((line) => line.id === edit.outro_alignment.final_line_id);
   const words = (closing?.words ?? []).flatMap((word, index) => [-1, 0].map((delta) =>
     ({label: `closing-word-${index + 1}-${delta < 0 ? 'before' : 'onset'}`, frame: offset + word.start_frame + delta})));
-  const all = [...intro, ...chapterStills(edit), ...choruses, ...words].filter(({frame}) =>
+  const all = [...intro, ...greeting, ...narration, ...chapterStills(edit), ...choruses, ...words].filter(({frame}) =>
     validFrame(frame) && frame < edit.total_frames).sort((a, b) => a.frame - b.frame);
   const unique = all.filter((item, index) => !index || item.frame !== all[index - 1].frame);
-  const selected = unique.length > 60 ? Array.from({length: 60}, (_, i) =>
-    unique[Math.round(i * (unique.length - 1) / 59)]) : unique;
-  return selected.map((item) => ({...item, filename: `frame-${String(item.frame).padStart(6, '0')}-${item.label}.png`}));
+  return unique.map((item) => ({...item, filename: `frame-${String(item.frame).padStart(6, '0')}-${item.label}.png`}));
 };

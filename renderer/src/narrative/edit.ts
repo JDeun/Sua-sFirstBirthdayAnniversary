@@ -5,6 +5,7 @@ import {EXCLUDED_STEMS} from '../opening-media';
 import type {FrameLayout} from './FrameLayout';
 import type {NarrativePlan} from './runtime-types';
 import type {PerformanceAsset, PerformanceAssignments} from '../performance/production-media';
+import {validateStoryCaptions} from './story-captions';
 
 export type NarrativeAsset = PerformanceAsset & {readonly poster?: string;
   readonly crop?: readonly [number, number, number, number]};
@@ -43,6 +44,10 @@ export const NARRATIVE_ASSETS = Object.fromEntries(Object.entries(plan.assets).m
 })) as unknown as Readonly<Record<string, NarrativeAsset>>;
 
 const validate = () => {
+  const closing = NARRATIVE.outro_alignment?.lines.find(line =>
+    line.id === NARRATIVE.outro_alignment?.final_line_id);
+  validateStoryCaptions(NARRATIVE.story_captions, NARRATIVE.main_duration_in_frames,
+    NARRATIVE.choruses, closing?.start_frame);
   const seen = new Set<string>();
   const forbidden = new Set(EXCLUDED_STEMS.map((s) => s.toLowerCase()));
   let end = 0;

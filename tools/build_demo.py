@@ -62,7 +62,7 @@ def runtime():
                "duration_in_frames": 0, "heartbeat": {"enabled": False}}
     plan = {"schema_version": "1.0", "status": "ready", "revision": "synthetic-demo", "fps": 30,
             "render_directory": "demo", "main_duration_in_frames": 120, "total_frames": 120,
-            "opening": opening, "choruses": [], "shots": shots, "assets": assets,
+            "opening": opening, "choruses": [], "shots": shots, "story_captions": [{"id": "demo-narration", "text": "Two pictures, one story", "start_frame": 0, "end_frame": 90, "placement": "bottom"}], "assets": assets,
             "outro_alignment": outro, "rhythm": {"beat_frames": [], "tempo_bpm": 0, "source": "none"},
             "memory_audio": {"enabled": False, "shot_id": "scene-a", "asset": "", "source_gain": 0,
                              "source_window_frames": [0, 60], "source_fade_frames": 4}}

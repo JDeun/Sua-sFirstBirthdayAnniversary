@@ -5,7 +5,8 @@ import type {CopyKey} from './copy-keys';
 
 export type FilmCopy = Readonly<{
   strings: Readonly<Record<string, string>>;
-  assets: Readonly<{heartbeat?: string | null; prenatal?: string | null; birth?: string | null}>;
+  assets: Readonly<{heartbeat?: string | null; prenatal?: string | null; birth?: string | null;
+    greeting?: string | null}>;
   opening: Readonly<{birth_trim_before?: number}>;
   song_asset?: string | null;
 }>;

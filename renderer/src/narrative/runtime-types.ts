@@ -15,6 +15,10 @@ export type MemoryAudioPlan = Readonly<{
   enabled?: boolean; shot_id: string; asset: string; source_gain: number;
   source_window_frames: readonly [number, number]; source_fade_frames: number;
 }>;
+export type StoryNarrationCue = Readonly<{
+  id: string; text: string; start_frame: number; end_frame: number;
+  placement?: 'bottom' | 'left' | 'right'; label?: string; date_label?: string; size?: number;
+}>;
 export type NarrativePlan = Readonly<{
   fps: number; revision?: string; render_directory?: string;
   total_frames: number; main_duration_in_frames: number; opening: NarrativeOpeningPlan;
@@ -23,4 +27,5 @@ export type NarrativePlan = Readonly<{
   memory_audio?: MemoryAudioPlan | null; outro_alignment?: OutroAlignment;
   rhythm?: Readonly<{beat_frames: readonly number[]}>;
   final_chorus_sequence?: Readonly<{distinct_dates: number}>;
+  story_captions?: readonly StoryNarrationCue[];
 }>;

@@ -9,7 +9,7 @@
 | 경로 | 역할 |
 | --- | --- |
 | `renderer/` | 서사 장면, 파스텔 우주 배경, 매치컷, 키네틱 타이포그래피, 별·왕관·선물 모션 |
-| `renderer/src/assets/` | 기존 도형과 달·행성·별똥별·구름·성·풍선 등 코드 에셋 11종 |
+| `renderer/src/assets/` | 목록용 코드 에셋 11종과 챕터 단위 선화 `StoryDoodles.tsx` |
 | `renderer/src/modules/face-matchcut/` | 개인 데이터·음악·테마 없이 재사용하는 얼굴 매치컷 재생 모듈 |
 | `tools/face_matchcut/` | 템플릿과 독립적인 얼굴 검출·기하학적 정렬 라이브러리 |
 | `tools/` | 미디어 목록, 촬영일·중복·편집표 검증, 얼굴 정렬, 비트 분석, 로컬 가사 정렬, 누끼·톤 조정 |
@@ -17,6 +17,7 @@
 | `examples/` | 실제 인물과 음악을 사용하지 않는 도형 예제 |
 | `models/` | 최종 사용 모델의 출처·라이선스·고정 SHA256 |
 | `scripts/` | 모델 검증과 공개 파일 검사 |
+| `docs/story-captions.md` | v8 선택 서사 문구의 시계·배치·스키마·검증 |
 | `docs/legacy-ideas.md` | 초기 스캐폴딩에서 남긴 제작 원칙 |
 
 설치 후 에셋만 먼저 보려면 `npm run assets:dev --prefix renderer`를 실행한다. 이 진입점은 개인 runtime이나 미디어를 준비할 필요가 없다. 종류·배치·음악 시계·합성 방법은 [에셋 안내](docs/asset-library.md)에 있다.
@@ -106,6 +107,20 @@ npm run preflight --prefix renderer
 7. 편집표를 검사하고 렌더한 뒤, 실제 화면·음량·영상 끝·연속 재생·청취를 검수한다.
 
 각 도구의 옵션은 `python3.11 tools/<도구>.py --help`로 확인한다. 가사 정렬은 선택 환경을 설치하고 [모델 안내](models/README.md)에 따라 로컬 모델을 준비한다. 원본 노래의 속도·음정과 가사 시계를 유지한다.
+
+## v8 선택 기능
+
+`narrative-edit.json`의 선택 배열 `story_captions`는 본편 노래의 전역 프레임 시계로 문장을 유지한다. 사진 컷마다 다시 시작하지 않으며 후렴과 동기화된 아웃트로 문구 구간은 보호한다. 필드를 생략하면 기존 컷별 문구를 사용하고, 빈 배열이면 컷별 문구도 표시하지 않는다. 구조·배치·일반 예시는 [서사 문구 안내](docs/story-captions.md)에 있다.
+
+선택 항목 `copy.json`의 `assets.greeting`에는 자산 디렉터리 기준 상대 경로를 넣는다. 다음은 해당 필드만 보인 예시다.
+
+```json
+{"assets": {"greeting": "opening/handwritten-title.mp4"}}
+```
+
+미리 렌더한 손글씨 영상은 음소거·`contain` 맞춤으로 타이틀 구간에 재생된다. `NarrativeOpening`의 타이틀 길이는 `min(120, birth_start_frame - title_start_frame)`이며 양수일 때만 표시한다. 영상은 프로젝트 fps와 이 길이에 맞춰 사전 제작한다. 자동 속도 조정은 없고, 경로를 생략하면 기존 텍스트 타이틀을 사용한다.
+
+`assets/StoryDoodles.tsx`의 선화는 챕터 시계로 한 번 그린 뒤 유지하며 미디어와 문구 영역을 피한다. [에셋 안내](docs/asset-library.md)와 [외부 도구·폰트 출처](THIRD_PARTY_NOTICES.md)를 함께 확인한다. 실제 브라우저 실행이 불가능한 샌드박스의 코드·데이터 검사만으로 v8 렌더 완료를 표시하지 않는다.
 
 ## 공개 파일 검사
 
